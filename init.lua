@@ -1,6 +1,15 @@
 local use = require("packer").use
 require("packer").startup(function()
 	use({
+		"kylechui/nvim-surround",
+		tag = "*", -- Use for stability; omit to use `main` branch for the latest features
+		config = function()
+			require("nvim-surround").setup({
+				-- Configuration here, or leave empty to use defaults
+			})
+		end,
+	})
+	use({
 		"lewis6991/gitsigns.nvim",
 		-- tag = 'release' -- To use the latest release (do not use this if you run Neovim nightly or dev builds!)
 	})
@@ -502,6 +511,8 @@ lspconfig["sumneko_lua"].setup({
 					[vim.fn.expand("$VIMRUNTIME/lua")] = true,
 					[vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
 				},
+				maxPreload = 10 * 1024,
+				preloadFileSize = 10 * 1024,
 			},
 		},
 	},
@@ -918,8 +929,8 @@ require("gitsigns").setup({
 	},
 	signcolumn = true, -- Toggle with `:Gitsigns toggle_signs`
 	numhl = false, -- Toggle with `:Gitsigns toggle_numhl`
-	linehl = true, -- Toggle with `:Gitsigns toggle_linehl`
-	word_diff = true, -- Toggle with `:Gitsigns toggle_word_diff`
+	linehl = false, -- Toggle with `:Gitsigns toggle_linehl`
+	word_diff = false, -- Toggle with `:Gitsigns toggle_word_diff`
 	watch_gitdir = {
 		interval = 1000,
 		follow_files = true,

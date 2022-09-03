@@ -1,9 +1,9 @@
-[11:35:34.248][info] [#0:/root/.config/nvim/lua_lsp/main.lua:65]: Lua Lsp startup, root: 	/root/.config/nvim/lua_lsp
-[11:35:34.248][info] [#0:/root/.config/nvim/lua_lsp/main.lua:66]: ROOT:	/root/.config/nvim/lua_lsp
-[11:35:34.248][info] [#0:/root/.config/nvim/lua_lsp/main.lua:67]: LOGPATH:	/root/.config/nvim/lua_lsp/log
-[11:35:34.248][info] [#0:/root/.config/nvim/lua_lsp/main.lua:68]: METAPATH:	/root/.config/nvim/lua_lsp/meta
-[11:35:34.248][info] [#0:/root/.config/nvim/lua_lsp/main.lua:69]: VERSION:	3.5.3
-[11:35:34.287][info] [#0:script/service/service.lua:141]: 
+[19:05:46.984][info] [#0:/root/.config/nvim/lua_lsp/main.lua:65]: Lua Lsp startup, root: 	/root/.config/nvim/lua_lsp
+[19:05:46.984][info] [#0:/root/.config/nvim/lua_lsp/main.lua:66]: ROOT:	/root/.config/nvim/lua_lsp
+[19:05:46.984][info] [#0:/root/.config/nvim/lua_lsp/main.lua:67]: LOGPATH:	/root/.config/nvim/lua_lsp/log
+[19:05:46.984][info] [#0:/root/.config/nvim/lua_lsp/main.lua:68]: METAPATH:	/root/.config/nvim/lua_lsp/meta
+[19:05:46.985][info] [#0:/root/.config/nvim/lua_lsp/main.lua:69]: VERSION:	3.5.3
+[19:05:47.034][info] [#0:script/service/service.lua:141]: 
 ========= Medical Examination Report =========
     --------------- Memory ---------------
         Total: 1.644 MB
@@ -25,7 +25,7 @@
         Holdon:   0
         Waiting:  0
 ==============================================
-[11:35:34.400][info] [#0:script/language.lua:137]: VSC language: nil
-[11:35:34.400][info] [#0:script/language.lua:138]: LS  language: en-us
-[11:35:34.400][info] [#0:script/workspace/workspace.lua:38]: Workspace init root: 	file:///root/.config/nvim
-[11:35:34.400][info] [#0:script/workspace/workspace.lua:42]: Log path: 	/root/.config/nvim/lua_lsp/log/file_root_.config_nvim.log
+[19:05:47.148][info] [#0:script/language.lua:137]: VSC language: nil
+[19:05:47.148][info] [#0:script/language.lua:138]: LS  language: en-us
+[19:05:47.148][info] [#0:script/workspace/workspace.lua:38]: Workspace init root: 	file:///root/.config/nvim
+[19:05:47.148][info] [#0:script/workspace/workspace.lua:42]: Log path: 	/root/.config/nvim/lua_lsp/log/file_root_.config_nvim.log

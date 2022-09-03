@@ -1,9 +1,9 @@
-[11:35:34.248][info] [#0:/root/.config/nvim/lua_lsp/main.lua:65]: Lua Lsp startup, root: 	/root/.config/nvim/lua_lsp
-[11:35:34.248][info] [#0:/root/.config/nvim/lua_lsp/main.lua:66]: ROOT:	/root/.config/nvim/lua_lsp
-[11:35:34.248][info] [#0:/root/.config/nvim/lua_lsp/main.lua:67]: LOGPATH:	/root/.config/nvim/lua_lsp/log
-[11:35:34.248][info] [#0:/root/.config/nvim/lua_lsp/main.lua:68]: METAPATH:	/root/.config/nvim/lua_lsp/meta
-[11:35:34.248][info] [#0:/root/.config/nvim/lua_lsp/main.lua:69]: VERSION:	3.5.3
-[11:35:34.287][info] [#0:script/service/service.lua:141]: 
+[19:05:46.984][info] [#0:/root/.config/nvim/lua_lsp/main.lua:65]: Lua Lsp startup, root: 	/root/.config/nvim/lua_lsp
+[19:05:46.984][info] [#0:/root/.config/nvim/lua_lsp/main.lua:66]: ROOT:	/root/.config/nvim/lua_lsp
+[19:05:46.984][info] [#0:/root/.config/nvim/lua_lsp/main.lua:67]: LOGPATH:	/root/.config/nvim/lua_lsp/log
+[19:05:46.984][info] [#0:/root/.config/nvim/lua_lsp/main.lua:68]: METAPATH:	/root/.config/nvim/lua_lsp/meta
+[19:05:46.985][info] [#0:/root/.config/nvim/lua_lsp/main.lua:69]: VERSION:	3.5.3
+[19:05:47.034][info] [#0:script/service/service.lua:141]: 
 ========= Medical Examination Report =========
     --------------- Memory ---------------
         Total: 1.644 MB
@@ -25,13 +25,13 @@
         Holdon:   0
         Waiting:  0
 ==============================================
-[11:35:34.400][info] [#0:script/language.lua:137]: VSC language: nil
-[11:35:34.400][info] [#0:script/language.lua:138]: LS  language: en-us
-[11:35:34.400][info] [#0:script/workspace/workspace.lua:38]: Workspace init root: 	file:///root/.config/nvim
-[11:35:34.400][info] [#0:script/workspace/workspace.lua:42]: Log path: 	/root/.config/nvim/lua_lsp/log/file_root_.config_nvim.log
-[11:35:34.401][info] [#0:script/workspace/workspace.lua:51]: Workspace create: 	file:///root/.config/nvim
-[11:35:34.605][info] [#0:script/provider/provider.lua:42]: Load config from client	file:///root/.config/nvim
-[11:35:34.605][info] [#0:script/provider/provider.lua:43]: {
+[19:05:47.148][info] [#0:script/language.lua:137]: VSC language: nil
+[19:05:47.148][info] [#0:script/language.lua:138]: LS  language: en-us
+[19:05:47.148][info] [#0:script/workspace/workspace.lua:38]: Workspace init root: 	file:///root/.config/nvim
+[19:05:47.148][info] [#0:script/workspace/workspace.lua:42]: Log path: 	/root/.config/nvim/lua_lsp/log/file_root_.config_nvim.log
+[19:05:47.148][info] [#0:script/workspace/workspace.lua:51]: Workspace create: 	file:///root/.config/nvim
+[19:05:47.251][info] [#0:script/provider/provider.lua:42]: Load config from client	file:///root/.config/nvim
+[19:05:47.252][info] [#0:script/provider/provider.lua:43]: {
   Lua = {
     diagnostics = {
       globals = { "vim" }
@@ -47,18 +47,20 @@
       library = {
         ["/usr/share/nvim/runtime/lua"] = true,
         ["/usr/share/nvim/runtime/lua/vim/lsp"] = true
-      }
+      },
+      maxPreload = 10240,
+      preloadFileSize = 10240
     }
   }
 }
-[11:35:34.605][info] [#0:script/provider/provider.lua:49]: Load config from .luarc.json/.luarc.jsonc	file:///root/.config/nvim
-[11:35:34.605][info] [#0:script/provider/provider.lua:50]: {
+[19:05:47.252][info] [#0:script/provider/provider.lua:49]: Load config from .luarc.json/.luarc.jsonc	file:///root/.config/nvim
+[19:05:47.252][info] [#0:script/provider/provider.lua:50]: {
   ["$schema"] = "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
   ["Lua.workspace.checkThirdParty"] = false,
   ["Lua.workspace.library"] = { "${3rd}/skynet/library" }
 }
-[11:35:34.605][info] [#0:script/provider/provider.lua:42]: Load config from client	file:///root/.config/nvim
-[11:35:34.605][info] [#0:script/provider/provider.lua:43]: {
+[19:05:47.252][info] [#0:script/provider/provider.lua:42]: Load config from client	file:///root/.config/nvim
+[19:05:47.252][info] [#0:script/provider/provider.lua:43]: {
   Lua = {
     diagnostics = {
       globals = { "vim" }
@@ -74,18 +76,20 @@
       library = {
         ["/usr/share/nvim/runtime/lua"] = true,
         ["/usr/share/nvim/runtime/lua/vim/lsp"] = true
-      }
+      },
+      maxPreload = 10240,
+      preloadFileSize = 10240
     }
   }
 }
-[11:35:34.605][info] [#0:script/provider/provider.lua:49]: Load config from .luarc.json/.luarc.jsonc	file:///root/.config/nvim
-[11:35:34.605][info] [#0:script/provider/provider.lua:50]: {
+[19:05:47.252][info] [#0:script/provider/provider.lua:49]: Load config from .luarc.json/.luarc.jsonc	file:///root/.config/nvim
+[19:05:47.252][info] [#0:script/provider/provider.lua:50]: {
   ["$schema"] = "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
   ["Lua.workspace.checkThirdParty"] = false,
   ["Lua.workspace.library"] = { "${3rd}/skynet/library" }
 }
-[11:35:34.705][info] [#0:script/provider/provider.lua:57]: Load config from client	fallback
-[11:35:34.706][info] [#0:script/provider/provider.lua:58]: {
+[19:05:47.353][info] [#0:script/provider/provider.lua:57]: Load config from client	fallback
+[19:05:47.353][info] [#0:script/provider/provider.lua:58]: {
   Lua = {
     diagnostics = {
       globals = { "vim" }
@@ -101,16 +105,18 @@
       library = {
         ["/usr/share/nvim/runtime/lua"] = true,
         ["/usr/share/nvim/runtime/lua/vim/lsp"] = true
-      }
+      },
+      maxPreload = 10240,
+      preloadFileSize = 10240
     }
   }
 }
-[11:35:34.706][info] [#0:script/library.lua:207]: Init builtin library at:	file:///root/.config/nvim
-[11:35:34.713][info] [#0:script/plugin.lua:86]: plugin path:	/root/.config/nvim
-[11:35:34.713][warn] [#0:script/plugin.lua:101]: plugin not found:	/root/.config/nvim
-[11:35:34.713][info] [#0:script/library.lua:207]: Init builtin library at:	nil
-[11:35:34.720][info] [#0:script/provider/provider.lua:57]: Load config from client	fallback
-[11:35:34.720][info] [#0:script/provider/provider.lua:58]: {
+[19:05:47.353][info] [#0:script/library.lua:207]: Init builtin library at:	file:///root/.config/nvim
+[19:05:47.366][info] [#0:script/plugin.lua:86]: plugin path:	/root/.config/nvim
+[19:05:47.366][warn] [#0:script/plugin.lua:101]: plugin not found:	/root/.config/nvim
+[19:05:47.366][info] [#0:script/library.lua:207]: Init builtin library at:	nil
+[19:05:47.374][info] [#0:script/provider/provider.lua:57]: Load config from client	fallback
+[19:05:47.374][info] [#0:script/provider/provider.lua:58]: {
   Lua = {
     diagnostics = {
       globals = { "vim" }
@@ -126,40 +132,47 @@
       library = {
         ["/usr/share/nvim/runtime/lua"] = true,
         ["/usr/share/nvim/runtime/lua/vim/lsp"] = true
-      }
+      },
+      maxPreload = 10240,
+      preloadFileSize = 10240
     }
   }
 }
-[11:35:34.720][info] [#0:script/workspace/workspace.lua:305]: Preload start:	file:///root/.config/nvim
-[11:35:34.721][info] [#0:script/workspace/workspace.lua:311]: Scan files at:	file:///root/.config/nvim
-[11:35:34.721][info] [#0:script/workspace/workspace.lua:305]: Preload start:	<fallback>
-[11:35:34.721][info] [#0:script/workspace/workspace.lua:328]: Scan library at:	file:///root/.config/nvim/lua_lsp/meta/LuaJIT%20en-us%20utf8
-[11:35:34.724][info] [#0:script/workspace/workspace.lua:328]: Scan library at:	file:///usr/share/nvim/runtime/lua
-[11:35:34.727][info] [#0:script/workspace/workspace.lua:328]: Scan library at:	file:///usr/share/nvim/runtime/lua/vim/lsp
-[11:35:34.839][info] [#0:script/workspace/workspace.lua:328]: Scan library at:	file:///root/.config/nvim/lua_lsp/meta/LuaJIT%20en-us%20utf8
-[11:35:34.840][info] [#0:script/workspace/workspace.lua:328]: Scan library at:	file:///root/.config/nvim/lua_lsp/meta/3rd/skynet/library
-[11:35:34.841][info] [#0:script/workspace/workspace.lua:348]: Found 61 files at:	<fallback>
-[11:35:34.841][info] [#0:script/workspace/loading.lua:152]: Load files from disk:	<fallback>
-[11:35:34.841][info] [#0:script/workspace/workspace.lua:348]: Found 1070 files at:	file:///root/.config/nvim
-[11:35:34.841][info] [#0:script/workspace/loading.lua:152]: Load files from disk:	file:///root/.config/nvim
-[11:35:34.858][info] [#0:script/workspace/loading.lua:164]: Loaded files takes [0.017] sec: <fallback>
-[11:35:34.858][info] [#0:script/workspace/loading.lua:173]: Compile files takes [0.000] sec: <fallback>
-[11:35:34.858][info] [#0:script/workspace/loading.lua:174]: Loaded finish:	<fallback>
-[11:35:34.858][info] [#0:script/workspace/workspace.lua:350]: Preload finish at:	<fallback>
-[11:35:35.070][warn] [#0:script/proto/proto.lua:122]: Response of [workspace/diagnostic/refresh] error [-32601]: MethodNotFound
-[11:35:37.317][info] [#0:script/workspace/loading.lua:164]: Loaded files takes [0.480] sec: file:///root/.config/nvim
-[11:35:37.317][info] [#0:script/workspace/loading.lua:173]: Compile files takes [0.000] sec: file:///root/.config/nvim
-[11:35:37.317][info] [#0:script/workspace/loading.lua:174]: Loaded finish:	file:///root/.config/nvim
-[11:35:37.317][info] [#0:script/workspace/workspace.lua:350]: Preload finish at:	file:///root/.config/nvim
-[11:35:38.735][warn] [#0:script/files.lua:524]: Parse LuaDoc of [file:///root/.config/nvim/lua_lsp/meta/3rd/Jass/library/jass/common.lua] takes [0.153] sec, size [448.808] kb.
-[11:35:40.283][warn] [#0:script/files.lua:513]: Compile [file:///root/.config/nvim/lua_lsp/meta/3rd/lovr/library/lovr/physics.lua] takes [0.123] sec, size [59.948] kb.
-[11:35:41.320][warn] [#0:script/files.lua:513]: Compile [file:///root/.config/nvim/lua_lsp/meta/default%20utf8/System.Data.OleDb.lua] takes [0.204] sec, size [37.630] kb.
-[11:35:42.086][warn] [#0:script/files.lua:524]: Parse LuaDoc of [file:///root/.config/nvim/lua_lsp/meta/default%20utf8/System.lua] takes [0.151] sec, size [428.566] kb.
-[11:35:43.283][warn] [#0:script/files.lua:513]: Compile [file:///root/.config/nvim/lua_lsp/meta/default%20utf8/System.Threading.Tasks.lua] takes [0.379] sec, size [81.776] kb.
-[11:35:44.316][info] [#0:script/provider/diagnostic.lua:486]: Diagnostics scope [<fallback>], files count:[1071]
-[11:35:44.317][warn] [#0:script/proto/proto.lua:122]: Response of [workspace/diagnostic/refresh] error [-32601]: MethodNotFound
-[11:35:47.842][warn] [#0:script/core/diagnostics/init.lua:158]: Diagnostics [missing-parameter] @ [file:///root/.config/nvim/lua_lsp/script/core/completion/completion.lua] takes [0.559] sec!
-[11:35:56.831][warn] [#0:script/await.lua:186]: Await step takes [0.653] sec.
-[11:35:56.969][warn] [#0:script/core/diagnostics/init.lua:158]: Diagnostics [missing-parameter] @ [file:///root/.config/nvim/lua_lsp/script/provider/provider.lua] takes [0.871] sec!
-[11:35:59.998][info] [#0:script/provider/provider.lua:168]: Server shutdown.
-[11:36:00.027][info] [#0:script/provider/provider.lua:161]: Server exited.
+[19:05:47.374][info] [#0:script/workspace/workspace.lua:305]: Preload start:	file:///root/.config/nvim
+[19:05:47.374][info] [#0:script/workspace/workspace.lua:311]: Scan files at:	file:///root/.config/nvim
+[19:05:47.374][info] [#0:script/workspace/workspace.lua:305]: Preload start:	<fallback>
+[19:05:47.375][info] [#0:script/workspace/workspace.lua:328]: Scan library at:	file:///root/.config/nvim/lua_lsp/meta/LuaJIT%20en-us%20utf8
+[19:05:47.378][info] [#0:script/workspace/workspace.lua:328]: Scan library at:	file:///usr/share/nvim/runtime/lua
+[19:05:47.381][info] [#0:script/workspace/workspace.lua:328]: Scan library at:	file:///usr/share/nvim/runtime/lua/vim/lsp
+[19:05:47.476][info] [#0:script/workspace/workspace.lua:328]: Scan library at:	file:///root/.config/nvim/lua_lsp/meta/LuaJIT%20en-us%20utf8
+[19:05:47.477][info] [#0:script/workspace/workspace.lua:328]: Scan library at:	file:///root/.config/nvim/lua_lsp/meta/3rd/skynet/library
+[19:05:47.478][info] [#0:script/workspace/workspace.lua:348]: Found 61 files at:	<fallback>
+[19:05:47.478][info] [#0:script/workspace/loading.lua:152]: Load files from disk:	<fallback>
+[19:05:47.478][info] [#0:script/workspace/workspace.lua:348]: Found 1070 files at:	file:///root/.config/nvim
+[19:05:47.478][info] [#0:script/workspace/loading.lua:152]: Load files from disk:	file:///root/.config/nvim
+[19:05:47.499][info] [#0:script/workspace/loading.lua:164]: Loaded files takes [0.018] sec: <fallback>
+[19:05:47.499][info] [#0:script/workspace/loading.lua:173]: Compile files takes [0.000] sec: <fallback>
+[19:05:47.499][info] [#0:script/workspace/loading.lua:174]: Loaded finish:	<fallback>
+[19:05:47.499][info] [#0:script/workspace/workspace.lua:350]: Preload finish at:	<fallback>
+[19:05:47.755][warn] [#0:script/proto/proto.lua:122]: Response of [workspace/diagnostic/refresh] error [-32601]: MethodNotFound
+[19:05:48.054][info] [#0:script/workspace/loading.lua:164]: Loaded files takes [0.515] sec: file:///root/.config/nvim
+[19:05:48.054][info] [#0:script/workspace/loading.lua:173]: Compile files takes [0.000] sec: file:///root/.config/nvim
+[19:05:48.054][info] [#0:script/workspace/loading.lua:174]: Loaded finish:	file:///root/.config/nvim
+[19:05:48.054][info] [#0:script/workspace/workspace.lua:350]: Preload finish at:	file:///root/.config/nvim
+[19:05:49.433][warn] [#0:script/files.lua:524]: Parse LuaDoc of [file:///root/.config/nvim/lua_lsp/meta/3rd/love2d/library/love/audio.lua] takes [0.121] sec, size [28.071] kb.
+[19:05:50.847][warn] [#0:script/files.lua:513]: Compile [file:///root/.config/nvim/lua_lsp/meta/3rd/lovr/library/lovr/graphics.lua] takes [0.177] sec, size [121.222] kb.
+[19:05:52.636][warn] [#0:script/files.lua:524]: Parse LuaDoc of [file:///root/.config/nvim/lua_lsp/meta/default%20utf8/UnityEngine.EventSystems.lua] takes [0.307] sec, size [35.827] kb.
+[19:05:53.512][warn] [#0:script/files.lua:524]: Parse LuaDoc of [file:///root/.config/nvim/lua_lsp/meta/default%20utf8/System.lua] takes [0.156] sec, size [428.566] kb.
+[19:05:54.213][warn] [#0:script/files.lua:524]: Parse LuaDoc of [file:///root/.config/nvim/lua_lsp/meta/default%20utf8/CS.lua] takes [0.146] sec, size [659.463] kb.
+[19:05:55.358][warn] [#0:script/files.lua:513]: Compile [file:///root/.config/nvim/lua_lsp/meta/default%20utf8/UnityEngine.lua] takes [0.694] sec, size [2521.240] kb.
+[19:05:55.954][warn] [#0:script/files.lua:524]: Parse LuaDoc of [file:///root/.config/nvim/lua_lsp/meta/default%20utf8/UnityEngine.lua] takes [0.590] sec, size [2521.240] kb.
+[19:05:57.471][warn] [#0:script/files.lua:524]: Parse LuaDoc of [file:///root/.config/nvim/lua_lsp/meta/default%20utf8/UnityEngine.Rendering.lua] takes [0.106] sec, size [436.882] kb.
+[19:05:58.390][warn] [#0:script/proto/proto.lua:122]: Response of [workspace/diagnostic/refresh] error [-32601]: MethodNotFound
+[19:06:00.071][info] [#0:script/provider/diagnostic.lua:486]: Diagnostics scope [file:///root/.config/nvim], files count:[1037]
+[19:06:00.072][info] [#0:script/provider/diagnostic.lua:486]: Diagnostics scope [<fallback>], files count:[1071]
+[19:06:00.725][warn] [#0:script/core/diagnostics/init.lua:158]: Diagnostics [missing-parameter] @ [file:///root/.config/nvim/init.lua] takes [0.609] sec!
+[19:06:00.725][warn] [#0:script/core/diagnostics/init.lua:158]: Diagnostics [missing-parameter] @ [file:///root/.config/nvim/init.lua] takes [0.609] sec!
+[19:06:13.726][warn] [#0:script/core/diagnostics/init.lua:158]: Diagnostics [deprecated] @ [file:///root/.config/nvim/lua_lsp/meta/default%20utf8/System.Linq.Expressions.lua] takes [12.077] sec!
+[19:06:13.750][warn] [#0:script/core/diagnostics/init.lua:158]: Diagnostics [deprecated] @ [file:///root/.config/nvim/lua_lsp/meta/default%20utf8/System.Linq.Expressions.lua] takes [12.100] sec!
+[19:06:15.805][info] [#0:script/provider/provider.lua:168]: Server shutdown.
+[19:06:15.818][info] [#0:script/provider/provider.lua:161]: Server exited.
