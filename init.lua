@@ -520,6 +520,21 @@ lspconfig["sumneko_lua"].setup({
 	on_attach = custom_lsp_attach,
 })
 
+lspconfig["clangd"].setup({
+	cmd = {
+		"clangd",
+		"--pch-storage=memory",
+		-- You MUST set this arg ↓ to your clangd executable location (if not included)!
+		"--query-driver=/usr/bin/gcc,/usr/bin/g++,/usr/bin/gcc*,/usr/bin/g++*",
+		"--clang-tidy",
+		"--all-scopes-completion",
+		"--cross-file-rename",
+		"--completion-style=detailed",
+		"--header-insertion=iwyu",
+		"-j=12",
+	},
+})
+
 -- luasnip setup
 local luasnip = require("luasnip")
 
@@ -577,6 +592,7 @@ cmp.setup({
 		{ name = "luasnip" },
 		{ name = "buffer" },
 		{ name = "path" },
+		{ name = "dictionary" },
 	},
 })
 
@@ -960,3 +976,5 @@ require("gitsigns").setup({
 		enable = false,
 	},
 })
+-- set rnu for vim number line
+vim.cmd([[set rnu]])
