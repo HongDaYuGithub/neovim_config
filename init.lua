@@ -9,6 +9,7 @@ require("packer").startup(function()
 			})
 		end,
 	})
+	use({ "theHamsta/nvim-treesitter-pairs" })
 	use({
 		"lewis6991/gitsigns.nvim",
 		-- tag = 'release' -- To use the latest release (do not use this if you run Neovim nightly or dev builds!)
@@ -525,9 +526,13 @@ lspconfig["clangd"].setup({
 		"--pch-storage=memory",
 		-- You MUST set this arg ↓ to your clangd executable location (if not included)!
 		"--background-index",
+		"--clang-tidy-checks=performance-*,bugprone-*",
 		"--limit-references=20",
 		"--limit-results=20",
-		"--query-driver=/usr/bin/gcc,/usr/bin/g++,/usr/bin/gcc*,/usr/bin/g++*",
+		"--query-driver=/usr/bin/gcc*,/usr/bin/clang++*,/usr/bin/clang*,/usr/bin/g++*,/opt/petalinux/2021.2/sysroots/x86_64-petalinux-linux/usr/bin/aarch64-xilinx-linux/aarch64-xilinx-linux-gcc, \
+        /opt/petalinux/2021.2/sysroots/x86_64-petalinux-linux/usr/bin/aarch64-xilinx-linux/aarch64-xilinx-linux-g++, \
+        /opt/petalinux/2019.2/sysroots/x86_64-petalinux-linux/usr/bin/arm-xilinx-linux/arm-xilinx-linux-gcc, \
+        /opt/petalinux/2019.2/sysroots/x86_64-petalinux-linux/usr/bin/arm-xilinx-linux/arm-xilinx-linux-g++",
 		"--clang-tidy",
 		"--all-scopes-completion",
 		"--completion-style=detailed",
@@ -981,3 +986,24 @@ require("gitsigns").setup({
 })
 -- set rnu for vim number line
 vim.cmd([[set rnu]])
+
+require("nvim-treesitter.configs").setup({
+	pairs = {
+		enable = true,
+		disable = {},
+		highlight_pair_events = { "CursorMoved" }, -- e.g. {"CursorMoved"}, -- when to highlight the pairs, use {} to deactivate highlighting
+		highlight_self = true, -- whether to highlight also the part of the pair under cursor (or only the partner)
+		goto_right_end = false, -- whether to go to the end of the right partner or the beginning
+		fallback_cmd_normal = "call matchit#Match_wrapper('',1,'n')", -- What command to issue when we can't find a pair (e.g. "normal! %")
+		keymaps = {
+			goto_partner = "<F7>",
+			delete_balanced = "X",
+		},
+		delete_balanced = {
+			only_on_first_char = false, -- whether to trigger balanced delete when on first character of a pair
+			fallback_cmd_normal = nil, -- fallback command when no pair found, can be nil
+			longest_partner = false, -- whether to delete the longest or the shortest pair when multiple found.
+			-- E.g. whether to delete the angle bracket or whole tag in  <pair> </pair>
+		},
+	},
+})
