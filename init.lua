@@ -517,7 +517,6 @@ lspconfig["sumneko_lua"].setup({
 		},
 	},
 	capabilities = capabilities,
-	on_attach = custom_lsp_attach,
 })
 
 lspconfig["clangd"].setup({
@@ -525,10 +524,12 @@ lspconfig["clangd"].setup({
 		"clangd",
 		"--pch-storage=memory",
 		-- You MUST set this arg ↓ to your clangd executable location (if not included)!
+		"--background-index",
+		"--limit-references=20",
+		"--limit-results=20",
 		"--query-driver=/usr/bin/gcc,/usr/bin/g++,/usr/bin/gcc*,/usr/bin/g++*",
 		"--clang-tidy",
 		"--all-scopes-completion",
-		"--cross-file-rename",
 		"--completion-style=detailed",
 		"--header-insertion=iwyu",
 		"-j=12",
@@ -592,7 +593,9 @@ cmp.setup({
 		{ name = "luasnip" },
 		{ name = "buffer" },
 		{ name = "path" },
-		{ name = "dictionary" },
+	},
+	options = {
+		indexing_interval = 10,
 	},
 })
 
