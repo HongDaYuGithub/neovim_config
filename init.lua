@@ -9,6 +9,8 @@ require("packer").startup(function()
 			})
 		end,
 	})
+	-- using packer.nvim
+	use({ "akinsho/bufferline.nvim", tag = "v2.*", requires = "kyazdani42/nvim-web-devicons" })
 	use({ "theHamsta/nvim-treesitter-pairs" })
 	use({
 		"lewis6991/gitsigns.nvim",
@@ -75,16 +77,7 @@ require("packer").startup(function()
 		end,
 	})
 	use("karb94/neoscroll.nvim")
-	use({ "rcarriga/nvim-dap-ui", requires = { "mfussenegger/nvim-dap" } })
 	use({ "mhartington/formatter.nvim" })
-	-- using packer.nvim
-	use({
-		"kdheepak/tabline.nvim",
-		config = function()
-			require("tabline").setup({ enable = false })
-		end,
-		requires = { "hoob3rt/lualine.nvim", "kyazdani42/nvim-web-devicons" },
-	})
 end)
 
 require("nvim-lsp-installer").setup({
@@ -113,131 +106,229 @@ require("nvim-treesitter.configs").setup({
 	},
 })
 
+--------------------------------------------------------------
+-- Eviline config for lualine
+-- Author: shadmansaleh
+-- Credit: glepnir
+local lualine = require("lualine")
+
+-- Color table for highlights
+-- stylua: ignore
 local colors = {
-	red = "#ca1243",
-	grey = "#a0a1a7",
-	black = "#383a42",
-	white = "#f3f3f3",
-	light_green = "#83a598",
-	orange = "#fe8019",
-	green = "#8ec07c",
+  bg       = '#202328',
+  fg       = '#bbc2cf',
+  yellow   = '#ECBE7B',
+  cyan     = '#008080',
+  darkblue = '#081633',
+  green    = '#98be65',
+  orange   = '#FF8800',
+  violet   = '#a9a1e1',
+  magenta  = '#c678dd',
+  blue     = '#51afef',
+  red      = '#ec5f67',
 }
 
-local theme = {
-	normal = {
-		a = { fg = colors.white, bg = colors.black },
-		b = { fg = colors.white, bg = colors.grey },
-		c = { fg = colors.black, bg = colors.white },
-		z = { fg = colors.white, bg = colors.black },
-	},
-	insert = { a = { fg = colors.black, bg = colors.light_green } },
-	visual = { a = { fg = colors.black, bg = colors.orange } },
-	replace = { a = { fg = colors.black, bg = colors.green } },
+local conditions = {
+	buffer_not_empty = function()
+		return vim.fn.empty(vim.fn.expand("%:t")) ~= 1
+	end,
+	hide_in_width = function()
+		return vim.fn.winwidth(0) > 80
+	end,
+	check_git_workspace = function()
+		local filepath = vim.fn.expand("%:p:h")
+		local gitdir = vim.fn.finddir(".git", filepath .. ";")
+		return gitdir and #gitdir > 0 and #gitdir < #filepath
+	end,
 }
 
-local empty = require("lualine.component"):extend()
-function empty:draw(default_highlight)
-	self.status = ""
-	self.applied_separator = ""
-	self:apply_highlights(default_highlight)
-	self:apply_section_separators()
-	return self.status
-end
-
--- Put proper separators and gaps between components in sections
-local function process_sections(sections)
-	for name, section in pairs(sections) do
-		local left = name:sub(9, 10) < "x"
-		for pos = 1, name ~= "lualine_z" and #section or #section - 1 do
-			table.insert(section, pos * 2, { empty, color = { fg = colors.white, bg = colors.white } })
-		end
-		for id, comp in ipairs(section) do
-			if type(comp) ~= "table" then
-				comp = { comp }
-				section[id] = comp
-			end
-			comp.separator = left and { right = "" } or { left = "" }
-		end
-	end
-	return sections
-end
-
-local function search_result()
-	if vim.v.hlsearch == 0 then
-		return ""
-	end
-	local last_search = vim.fn.getreg("/")
-	if not last_search or last_search == "" then
-		return ""
-	end
-	local searchcount = vim.fn.searchcount({ maxcount = 9999 })
-	return last_search .. "(" .. searchcount.current .. "/" .. searchcount.total .. ")"
-end
-
-local function modified()
-	if vim.bo.modified then
-		return "+"
-	elseif vim.bo.modifiable == false or vim.bo.readonly == true then
-		return "-"
-	end
-	return ""
-end
-
-require("lualine").setup({
+-- Config
+local config = {
 	options = {
-		theme = theme,
+		-- Disable sections and component separators
 		component_separators = "",
-		section_separators = { left = "", right = "" },
-	},
-	sections = process_sections({
-		lualine_a = { "mode" },
-		lualine_b = {
-			"branch",
-			"diff",
-			{
-				"diagnostics",
-				source = { "nvim" },
-				sections = { "error" },
-				diagnostics_color = { error = { bg = colors.red, fg = colors.white } },
-			},
-			{
-				"diagnostics",
-				source = { "nvim" },
-				sections = { "warn" },
-				diagnostics_color = { warn = { bg = colors.orange, fg = colors.white } },
-			},
-			{ "filename", file_status = false, path = 1 },
-			{ modified, color = { bg = colors.red } },
-			{
-				"%w",
-				cond = function()
-					return vim.wo.previewwindow
-				end,
-			},
-			{
-				"%r",
-				cond = function()
-					return vim.bo.readonly
-				end,
-			},
-			{
-				"%q",
-				cond = function()
-					return vim.bo.buftype == "quickfix"
-				end,
-			},
+		section_separators = "",
+		theme = {
+			-- We are going to use lualine_c an lualine_x as left and
+			-- right section. Both are highlighted by c theme .  So we
+			-- are just setting default looks o statusline
+			normal = { c = { fg = colors.fg, bg = colors.bg } },
+			inactive = { c = { fg = colors.fg, bg = colors.bg } },
 		},
+	},
+	sections = {
+		-- these are to remove the defaults
+		lualine_a = {},
+		lualine_b = {},
+		lualine_y = {},
+		lualine_z = {},
+		-- These will be filled later
 		lualine_c = {},
 		lualine_x = {},
-		lualine_y = { search_result, "filetype" },
-		lualine_z = { "%l:%c", "%p%%/%L" },
-	}),
+	},
 	inactive_sections = {
-		lualine_c = { "%f %y %m" },
+		-- these are to remove the defaults
+		lualine_a = {},
+		lualine_b = {},
+		lualine_y = {},
+		lualine_z = {},
+		lualine_c = {},
 		lualine_x = {},
+	},
+}
+
+-- Inserts a component in lualine_c at left section
+local function ins_left(component)
+	table.insert(config.sections.lualine_c, component)
+end
+
+-- Inserts a component in lualine_x ot right section
+local function ins_right(component)
+	table.insert(config.sections.lualine_x, component)
+end
+
+ins_left({
+	function()
+		return "▊"
+	end,
+	color = { fg = colors.blue }, -- Sets highlighting of component
+	padding = { left = 0, right = 1 }, -- We don't need space before this
+})
+
+ins_left({
+	-- mode component
+	function()
+		return ""
+	end,
+	color = function()
+		-- auto change color according to neovims mode
+		local mode_color = {
+			n = colors.red,
+			i = colors.green,
+			v = colors.blue,
+			[""] = colors.blue,
+			V = colors.blue,
+			c = colors.magenta,
+			no = colors.red,
+			s = colors.orange,
+			S = colors.orange,
+			[""] = colors.orange,
+			ic = colors.yellow,
+			R = colors.violet,
+			Rv = colors.violet,
+			cv = colors.red,
+			ce = colors.red,
+			r = colors.cyan,
+			rm = colors.cyan,
+			["r?"] = colors.cyan,
+			["!"] = colors.red,
+			t = colors.red,
+		}
+		return { fg = mode_color[vim.fn.mode()] }
+	end,
+	padding = { right = 1 },
+})
+
+ins_left({
+	-- filesize component
+	"filesize",
+	cond = conditions.buffer_not_empty,
+})
+
+ins_left({
+	"filename",
+	cond = conditions.buffer_not_empty,
+	color = { fg = colors.magenta, gui = "bold" },
+})
+
+ins_left({ "location" })
+
+ins_left({ "progress", color = { fg = colors.fg, gui = "bold" } })
+
+ins_left({
+	"diagnostics",
+	sources = { "nvim_diagnostic" },
+	symbols = { error = " ", warn = " ", info = " " },
+	diagnostics_color = {
+		color_error = { fg = colors.red },
+		color_warn = { fg = colors.yellow },
+		color_info = { fg = colors.cyan },
 	},
 })
 
+-- Insert mid section. You can make any number of sections in neovim :)
+-- for lualine it's any number greater then 2
+ins_left({
+	function()
+		return "%="
+	end,
+})
+
+ins_left({
+	-- Lsp server name .
+	function()
+		local msg = "No Active Lsp"
+		local buf_ft = vim.api.nvim_buf_get_option(0, "filetype")
+		local clients = vim.lsp.get_active_clients()
+		if next(clients) == nil then
+			return msg
+		end
+		for _, client in ipairs(clients) do
+			local filetypes = client.config.filetypes
+			if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
+				return client.name
+			end
+		end
+		return msg
+	end,
+	icon = " LSP:",
+	color = { fg = "#ffffff", gui = "bold" },
+})
+
+-- Add components to right sections
+ins_right({
+	"o:encoding", -- option component same as &encoding in viml
+	fmt = string.upper, -- I'm not sure why it's upper case either ;)
+	cond = conditions.hide_in_width,
+	color = { fg = colors.green, gui = "bold" },
+})
+
+ins_right({
+	"fileformat",
+	fmt = string.upper,
+	icons_enabled = false, -- I think icons are cool but Eviline doesn't have them. sigh
+	color = { fg = colors.green, gui = "bold" },
+})
+
+ins_right({
+	"branch",
+	icon = "",
+	color = { fg = colors.violet, gui = "bold" },
+})
+
+ins_right({
+	"diff",
+	-- Is it me or the symbol for modified us really weird
+	symbols = { added = " ", modified = "柳 ", removed = " " },
+	diff_color = {
+		added = { fg = colors.green },
+		modified = { fg = colors.orange },
+		removed = { fg = colors.red },
+	},
+	cond = conditions.hide_in_width,
+})
+
+ins_right({
+	function()
+		return "▊"
+	end,
+	color = { fg = colors.blue },
+	padding = { left = 1 },
+})
+
+-- Now don't forget to initialize lualine
+lualine.setup(config)
+--------------------------------------------------------------
 -- Utilities for creating configurations
 local util = require("formatter.util")
 
@@ -359,62 +450,6 @@ require("formatter").setup({
 	},
 })
 
-require("dapui").setup({
-	icons = { expanded = "▾", collapsed = "▸" },
-	mappings = {
-		-- Use a table to apply multiple mappings
-		expand = { "<CR>", "<2-LeftMouse>" },
-		open = "o",
-		remove = "d",
-		edit = "e",
-		repl = "r",
-		toggle = "t",
-	},
-	-- Expand lines larger than the window
-	-- Requires >= 0.7
-	expand_lines = vim.fn.has("nvim-0.7"),
-	-- Layouts define sections of the screen to place windows.
-	-- The position can be "left", "right", "top" or "bottom".
-	-- The size specifies the height/width depending on position. It can be an Int
-	-- or a Float. Integer specifies height/width directly (i.e. 20 lines/columns) while
-	-- Float value specifies percentage (i.e. 0.3 - 30% of available lines/columns)
-	-- Elements are the elements shown in the layout (in order).
-	-- Layouts are opened in order so that earlier layouts take priority in window sizing.
-	layouts = {
-		{
-			elements = {
-				-- Elements can be strings or table with id and size keys.
-				{ id = "scopes", size = 0.25 },
-				"breakpoints",
-				"stacks",
-				"watches",
-			},
-			size = 40, -- 40 columns
-			position = "left",
-		},
-		{
-			elements = {
-				"repl",
-				"console",
-			},
-			size = 0.25, -- 25% of total lines
-			position = "bottom",
-		},
-	},
-	floating = {
-		max_height = nil, -- These can be integers or a float between 0 and 1.
-		max_width = nil, -- Floats will be treated as percentage of your screen.
-		border = "single", -- Border style. Can be "single", "double" or "rounded"
-		mappings = {
-			close = { "q", "<Esc>" },
-		},
-	},
-	windows = { indent = 1 },
-	render = {
-		max_type_length = nil, -- Can be integer or nil.
-	},
-})
-
 require("toggleterm").setup({
 	-- size can be a number or function which is passed the current terminal
 	size = function(term)
@@ -481,19 +516,15 @@ capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
 local lspconfig = require("lspconfig")
 
 -- Enable some language servers with the additional completion capabilities offered by nvim-cmp
-local servers = { "clangd", "pyright", "bashls", "cmake", "rust_analyzer", "sumneko_lua" }
+local servers = { "clangd", "pyright", "bashls", "cmake", "rust_analyzer", "sumneko_lua", "awk_ls" }
+
 for _, lsp in ipairs(servers) do
 	lspconfig[lsp].setup({
 		capabilities = capabilities,
 	})
 end
 
--- lua lsp config
-
-local sumneko_root_path = "/root/.config/nvim/lua_lsp"
-local sumneko_binary = sumneko_root_path .. "/bin/lua-language-server"
 lspconfig["sumneko_lua"].setup({
-	cmd = { sumneko_binary, "-E", sumneko_root_path .. "/bin/main.lua" },
 	settings = {
 		Lua = {
 			runtime = {
@@ -652,7 +683,130 @@ vim.cmd([[set selection=exclusive]])
 vim.cmd([[set selectmode=mouse,key]])
 vim.cmd([[set nu]])
 
-require("nvim-tree").setup({})
+require("nvim-tree").setup({
+	ignore_ft_on_setup = {
+		"startify",
+		"dashboard",
+		"alpha",
+	},
+	auto_reload_on_write = true,
+	hijack_directories = {
+		enable = false,
+	},
+	update_cwd = true,
+	diagnostics = {
+		show_on_dirs = false,
+		icons = {
+			hint = "",
+			info = "",
+			warning = "",
+			error = "",
+		},
+	},
+	update_focused_file = {
+		enable = true,
+		update_cwd = true,
+		ignore_list = {},
+	},
+	system_open = {
+		cmd = nil,
+		args = {},
+	},
+	git = {
+		enable = true,
+		ignore = false,
+		timeout = 200,
+	},
+	view = {
+		width = 30,
+		height = 30,
+		hide_root_folder = false,
+		side = "left",
+		mappings = {
+			custom_only = false,
+			list = {},
+		},
+		number = false,
+		relativenumber = false,
+		signcolumn = "yes",
+	},
+	renderer = {
+		indent_markers = {
+			enable = false,
+			icons = {
+				corner = "└",
+				edge = "│",
+				item = "│",
+				none = " ",
+			},
+		},
+		icons = {
+			glyphs = {
+				default = "",
+				symlink = "",
+				git = {
+					unstaged = "",
+					staged = "S",
+					unmerged = "",
+					renamed = "➜",
+					deleted = "",
+					untracked = "U",
+					ignored = "◌",
+				},
+				folder = {
+					default = "",
+					open = "",
+					empty = "",
+					empty_open = "",
+					symlink = "",
+				},
+			},
+		},
+		highlight_git = true,
+		root_folder_modifier = ":t",
+	},
+	filters = {
+		dotfiles = false,
+		custom = { "node_modules", "\\.cache" },
+		exclude = {},
+	},
+	trash = {
+		cmd = "trash",
+		require_confirm = true,
+	},
+	log = {
+		enable = false,
+		truncate = false,
+		types = {
+			all = false,
+			config = false,
+			copy_paste = false,
+			diagnostics = false,
+			git = false,
+			profile = false,
+		},
+	},
+	actions = {
+		use_system_clipboard = true,
+		change_dir = {
+			enable = true,
+			global = false,
+			restrict_above_cwd = false,
+		},
+		open_file = {
+			quit_on_open = false,
+			resize_window = false,
+			window_picker = {
+				enable = true,
+				chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+				exclude = {
+					filetype = { "notify", "packer", "qf", "diff", "fugitive", "fugitiveblame" },
+					buftype = { "nofile", "terminal", "help" },
+				},
+			},
+		},
+	},
+})
 
 require("nvim-cursorline").setup({
 	cursorline = {
@@ -668,11 +822,6 @@ require("nvim-cursorline").setup({
 })
 
 vim.cmd([[map <C-n> :ToggleTerm direction=float<CR>]])
-vim.cmd([[
-set guioptions-=e " Use showtabline in gui vim
-set sessionoptions+=tabpages,globals " store tabpages and globals in session
-]])
-vim.cmd([[map <F6> :NvimTreeToggle<CR>]])
 vim.g.catppuccin_flavour = "macchiato" -- latte, frappe, macchiato, mocha
 
 -- Theme
@@ -826,6 +975,14 @@ vim.cmd([[set cursorline]])
 local keymap = vim.keymap.set
 keymap("n", "gh", "<cmd>Lspsaga lsp_finder<CR>", { silent = true })
 
+keymap("i", "<A-j>", "<Esc>:m .+1<CR>==gi", { silent = true })
+keymap("i", "<A-k>", "<Esc>:m .-2<CR>==gi", { silent = true })
+keymap("n", "<A-j>", "<Esc>:m .+1<CR>==", { silent = true })
+keymap("n", "<A-k>", "<Esc>:m .-2<CR>==", { silent = true })
+keymap("n", "e", "<cmd>NvimTreeToggle<CR>", { silent = true })
+keymap("v", "<A-j>", ":m '>+1<CR>gv-gv", { silent = true })
+keymap("v", "<A-k>", ":m '<-2<CR>gv-gv", { silent = true })
+
 -- Code action
 keymap("n", "<leader>ca", "<cmd>Lspsaga code_action<CR>", { silent = true })
 keymap("v", "<leader>ca", "<cmd><C-U>Lspsaga range_code_action<CR>", { silent = true })
@@ -868,17 +1025,6 @@ keymap("n", "<A-d>", "<cmd>Lspsaga open_floaterm lazygit<CR>", { silent = true }
 -- close floaterm
 keymap("t", "<A-d>", [[<C-\><C-n><cmd>Lspsaga close_floaterm<CR>]], { silent = true })
 
-require("lualine").setup({
-	tabline = {
-		lualine_a = {},
-		lualine_b = {},
-		lualine_c = { require("tabline").tabline_buffers },
-		lualine_x = { require("tabline").tabline_tabs },
-		lualine_y = {},
-		lualine_z = {},
-	},
-})
-
 local alpha = require("alpha")
 local dashboard = require("alpha.themes.dashboard")
 
@@ -896,10 +1042,11 @@ dashboard.section.header.val = {
 
 -- Set menu
 dashboard.section.buttons.val = {
-	dashboard.button("e", " New File", ":ene <BAR> startinsert <CR>"),
-	dashboard.button("f", " Find Fine", ":Telescope find_files<CR>"),
-	dashboard.button("w", " Find Word", ":Telescope live_grep<CR>"),
-	dashboard.button("q", " Quit Nvim", ":qa<CR>"),
+	dashboard.button("<leader>n", " New File", ":ene <BAR> startinsert <CR>"),
+	dashboard.button("<leader>f", " Find Fine", ":Telescope find_files<CR>"),
+	dashboard.button("<leader>r", " Recently Used Files", ":Telescope oldfiles<CR>"),
+	dashboard.button("<leader>w", " Find Word", ":Telescope live_grep<CR>"),
+	dashboard.button("<leader>q", " Quit Nvim", ":qa<CR>"),
 }
 
 -- Set footer
@@ -927,16 +1074,6 @@ vim.cmd([[
     autocmd FileType alpha setlocal nofoldenable
 ]])
 
-local dap, dapui = require("dap"), require("dapui")
-dap.listeners.after.event_initialized["dapui_config"] = function()
-	dapui.open()
-end
-dap.listeners.before.event_terminated["dapui_config"] = function()
-	dapui.close()
-end
-dap.listeners.before.event_exited["dapui_config"] = function()
-	dapui.close()
-end
 require("lsp_signature").setup({
 	bind = true, -- This is mandatory, otherwise border config won't get registered.
 	handler_opts = {
@@ -1005,5 +1142,91 @@ require("nvim-treesitter.configs").setup({
 			longest_partner = false, -- whether to delete the longest or the shortest pair when multiple found.
 			-- E.g. whether to delete the angle bracket or whole tag in  <pair> </pair>
 		},
+	},
+})
+
+vim.cmd([[let mapleader=" "]])
+
+vim.opt.termguicolors = true
+require("bufferline").setup({
+	options = {
+		mode = "buffers", -- set to "tabs" to only show tabpages instead
+		numbers = "none", -- can be "none" | "ordinal" | "buffer_id" | "both" | function
+		close_command = "bdelete! %d", -- can be a string | function, see "Mouse actions"
+		right_mouse_command = "vert sbuffer %d", -- can be a string | function, see "Mouse actions"
+		left_mouse_command = "buffer %d", -- can be a string | function, see "Mouse actions"
+		middle_mouse_command = nil, -- can be a string | function, see "Mouse actions"
+		indicator = {
+			icon = "▎", -- this should be omitted if indicator style is not 'icon'
+			style = "icon", -- can also be 'underline'|'none',
+		},
+		buffer_close_icon = "",
+		modified_icon = "●",
+		close_icon = "",
+		left_trunc_marker = "",
+		right_trunc_marker = "",
+		--- name_formatter can be used to change the buffer's label in the bufferline.
+		--- Please note some names can/will break the
+		--- bufferline so use this at your discretion knowing that it has
+		--- some limitations that will *NOT* be fixed.
+		name_formatter = function(buf) -- buf contains a "name", "path" and "bufnr"
+			-- remove extension from markdown files for example
+			if buf.name:match("%.md") then
+				return vim.fn.fnamemodify(buf.name, ":t:r")
+			end
+		end,
+		max_name_length = 18,
+		max_prefix_length = 15, -- prefix used when a buffer is de-duplicated
+		truncate_names = true, -- whether or not tab names should be truncated
+		tab_size = 18,
+		diagnostics = "nvim_lsp",
+		diagnostics_update_in_insert = false,
+		-- NOTE: this will be called a lot so don't do any heavy processing here
+		offsets = {
+			{
+				filetype = "undotree",
+				text = "Undotree",
+				highlight = "PanelHeading",
+				padding = 1,
+			},
+			{
+				filetype = "NvimTree",
+				text = "Explorer",
+				highlight = "PanelHeading",
+				padding = 1,
+			},
+			{
+				filetype = "DiffviewFiles",
+				text = "Diff View",
+				highlight = "PanelHeading",
+				padding = 1,
+			},
+			{
+				filetype = "flutterToolsOutline",
+				text = "Flutter Outline",
+				highlight = "PanelHeading",
+			},
+			{
+				filetype = "packer",
+				text = "Packer",
+				highlight = "PanelHeading",
+				padding = 1,
+			},
+		},
+		color_icons = true, -- whether or not to add the filetype icon highlights
+		show_close_icon = false,
+		show_tab_indicators = true,
+		persist_buffer_sort = true, -- whether or not custom sorted buffers should persist
+		-- can also be a table containing 2 custom separators
+		-- [focused and unfocused]. eg: { '|', '|' }
+		separator_style = "thin",
+		enforce_regular_tabs = false,
+		always_show_bufferline = false,
+		hover = {
+			enabled = false, -- requires nvim 0.8+
+			delay = 200,
+			reveal = { "close" },
+		},
+		sort_by = "id",
 	},
 })
