@@ -1,3 +1,22 @@
+vim.cmd([[set noswapfile]])
+vim.cmd([[set expandtab]])
+vim.cmd([[set tabstop=4]])
+vim.cmd([[set mouse=a]])
+vim.cmd([[set selection=exclusive]])
+vim.cmd([[set selectmode=mouse,key]])
+vim.cmd([[set nu]])
+vim.cmd([[let mapleader=" "]])
+vim.cmd([[map <C-n> :ToggleTerm direction=float<CR>]])
+vim.cmd([[colorscheme catppuccin]])
+vim.cmd([[nmap <tab> :bn<cr>]])
+vim.cmd([[nmap <C-S> :w<cr>]])
+vim.cmd([[set showcmd]])
+vim.cmd([[set cursorline]])
+vim.cmd([[
+    autocmd FileType alpha setlocal nofoldenable
+]])
+vim.cmd([[set rnu]])
+
 local use = require("packer").use
 require("packer").startup(function()
 	use({
@@ -9,6 +28,7 @@ require("packer").startup(function()
 			})
 		end,
 	})
+	use({ "simrat39/symbols-outline.nvim" })
 	-- using packer.nvim
 	use({ "akinsho/bufferline.nvim", tag = "v2.*", requires = "kyazdani42/nvim-web-devicons" })
 	use({ "theHamsta/nvim-treesitter-pairs" })
@@ -92,7 +112,7 @@ require("nvim-lsp-installer").setup({
 })
 
 require("lspconfig").ocamllsp.setup({ on_attach = require("virtualtypes").on_attach })
-
+require("symbols-outline").setup({ position = "right" })
 require("nvim-treesitter.configs").setup({
 	highlight = {},
 	-- ...
@@ -561,9 +581,9 @@ lspconfig["clangd"].setup({
 		"--limit-references=20",
 		"--limit-results=20",
 		"--query-driver=/usr/bin/gcc*,/usr/bin/clang++*,/usr/bin/clang*,/usr/bin/g++*,/opt/petalinux/2021.2/sysroots/x86_64-petalinux-linux/usr/bin/aarch64-xilinx-linux/aarch64-xilinx-linux-gcc, \
-        /opt/petalinux/2021.2/sysroots/x86_64-petalinux-linux/usr/bin/aarch64-xilinx-linux/aarch64-xilinx-linux-g++, \
-        /opt/petalinux/2019.2/sysroots/x86_64-petalinux-linux/usr/bin/arm-xilinx-linux/arm-xilinx-linux-gcc, \
-        /opt/petalinux/2019.2/sysroots/x86_64-petalinux-linux/usr/bin/arm-xilinx-linux/arm-xilinx-linux-g++",
+                /opt/petalinux/2021.2/sysroots/x86_64-petalinux-linux/usr/bin/aarch64-xilinx-linux/aarch64-xilinx-linux-g++, \
+                /opt/petalinux/2019.2/sysroots/x86_64-petalinux-linux/usr/bin/arm-xilinx-linux/arm-xilinx-linux-gcc, \
+                /opt/petalinux/2019.2/sysroots/x86_64-petalinux-linux/usr/bin/arm-xilinx-linux/arm-xilinx-linux-g++",
 		"--clang-tidy",
 		"--all-scopes-completion",
 		"--completion-style=detailed",
@@ -675,20 +695,13 @@ require("nvim-treesitter.configs").setup({
 	},
 })
 
-vim.cmd([[set noswapfile]])
-vim.cmd([[set expandtab]])
-vim.cmd([[set tabstop=4]])
-vim.cmd([[set mouse=a]])
-vim.cmd([[set selection=exclusive]])
-vim.cmd([[set selectmode=mouse,key]])
-vim.cmd([[set nu]])
-
 require("nvim-tree").setup({
 	ignore_ft_on_setup = {
 		"startify",
 		"dashboard",
 		"alpha",
 	},
+	hijack_cursor = true,
 	auto_reload_on_write = true,
 	hijack_directories = {
 		enable = false,
@@ -714,7 +727,7 @@ require("nvim-tree").setup({
 	},
 	git = {
 		enable = true,
-		ignore = false,
+		ignore = true,
 		timeout = 200,
 	},
 	view = {
@@ -732,7 +745,7 @@ require("nvim-tree").setup({
 	},
 	renderer = {
 		indent_markers = {
-			enable = false,
+			enable = true,
 			icons = {
 				corner = "└",
 				edge = "│",
@@ -821,16 +834,13 @@ require("nvim-cursorline").setup({
 	},
 })
 
-vim.cmd([[map <C-n> :ToggleTerm direction=float<CR>]])
 vim.g.catppuccin_flavour = "macchiato" -- latte, frappe, macchiato, mocha
 
 -- Theme
 
 require("catppuccin").setup()
-vim.cmd([[colorscheme catppuccin]])
 
 -- nord colorscheme
--- vim.cmd[[colorscheme nord]]
 
 -- Lua
 local actions = require("diffview.actions")
@@ -967,11 +977,6 @@ augroup END
 	true
 )
 
-vim.cmd([[nmap <tab> :bn<cr>]])
-vim.cmd([[nmap <C-S> :w<cr>]])
-vim.cmd([[set showcmd]])
-vim.cmd([[set cursorline]])
-
 local keymap = vim.keymap.set
 keymap("n", "gh", "<cmd>Lspsaga lsp_finder<CR>", { silent = true })
 
@@ -979,25 +984,28 @@ keymap("i", "<A-j>", "<Esc>:m .+1<CR>==gi", { silent = true })
 keymap("i", "<A-k>", "<Esc>:m .-2<CR>==gi", { silent = true })
 keymap("n", "<A-j>", "<Esc>:m .+1<CR>==", { silent = true })
 keymap("n", "<A-k>", "<Esc>:m .-2<CR>==", { silent = true })
-keymap("n", "e", "<cmd>NvimTreeToggle<CR>", { silent = true })
+keymap("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", { silent = true })
 keymap("v", "<A-j>", ":m '>+1<CR>gv-gv", { silent = true })
 keymap("v", "<A-k>", ":m '<-2<CR>gv-gv", { silent = true })
-
+keymap("n", "<A-q>", "<cmd>BufferLineCloseRight<CR>", { silent = true })
+keymap("i", "jj", "<Esc><Esc>", { silent = true })
 -- Code action
 keymap("n", "<leader>ca", "<cmd>Lspsaga code_action<CR>", { silent = true })
 keymap("v", "<leader>ca", "<cmd><C-U>Lspsaga range_code_action<CR>", { silent = true })
+keymap("n", "<leader>w", "<cmd>Telescope live_grep<CR>", { silent = true })
+keymap("n", "<leader>f", "<cmd>Telescope find_files<CR>", { silent = true })
+keymap("n", "<C-q>", "<cmd>wa!|qa!<CR>", { silent = true })
 
 -- Rename
 keymap("n", "gr", "<cmd>Lspsaga rename<CR>", { silent = true })
 
 -- Definition preview
-keymap("n", "gd", "<cmd>Lspsaga preview_definition<CR>", { silent = true })
+keymap("n", "gd", "<cmd>Lspsaga peek_definition<CR>", { silent = true })
 
 -- Show line diagnostics
 keymap("n", "<leader>cd", "<cmd>Lspsaga show_line_diagnostics<CR>", { silent = true })
 
 -- Show cursor diagnostic
-keymap("n", "<leader>cd", "<cmd>Lspsaga show_cursor_diagnostics<CR>", { silent = true })
 
 -- Diagnsotic jump can use `<c-o>` to jump back
 keymap("n", "[e", "<cmd>Lspsaga diagnostic_jump_next<CR>", { silent = true })
@@ -1049,30 +1057,12 @@ dashboard.section.buttons.val = {
 	dashboard.button("<leader>q", " Quit Nvim", ":qa<CR>"),
 }
 
--- Set footer
---   NOTE: This is currently a feature in my fork of alpha-nvim (opened PR #21, will update snippet if added to main)
---   To see test this yourself, add the function as a dependecy in packer and uncomment the footer lines
---   ```init.lua
---   return require('packer').startup(function()
---       use 'wbthomason/packer.nvim'
---       use {
---           'goolord/alpha-nvim', branch = 'feature/startify-fortune',
---           requires = {'BlakeJC94/alpha-nvim-fortune'},
---           config = function() require("config.alpha") end
---       }
---   end)
---   ```
 dashboard.section.footer.val = {
-	[[ code code day day up -- HongDaYu ]],
+	[[ Code Code Day Day Up -- HongDaYu ]],
 }
 
 -- Send config to alpha
 alpha.setup(dashboard.opts)
-
--- Disable folding on alpha buffer
-vim.cmd([[
-    autocmd FileType alpha setlocal nofoldenable
-]])
 
 require("lsp_signature").setup({
 	bind = true, -- This is mandatory, otherwise border config won't get registered.
@@ -1122,7 +1112,6 @@ require("gitsigns").setup({
 	},
 })
 -- set rnu for vim number line
-vim.cmd([[set rnu]])
 
 require("nvim-treesitter.configs").setup({
 	pairs = {
@@ -1144,8 +1133,6 @@ require("nvim-treesitter.configs").setup({
 		},
 	},
 })
-
-vim.cmd([[let mapleader=" "]])
 
 vim.opt.termguicolors = true
 require("bufferline").setup({
@@ -1191,7 +1178,7 @@ require("bufferline").setup({
 			},
 			{
 				filetype = "NvimTree",
-				text = "Explorer",
+				text = "File Explorer",
 				highlight = "PanelHeading",
 				padding = 1,
 			},
