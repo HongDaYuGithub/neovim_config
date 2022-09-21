@@ -948,7 +948,7 @@ require("nvim-tree").setup({
 		},
 	},
 	update_focused_file = {
-		enable = true,
+		enable = false,
 		update_cwd = true,
 		ignore_list = {},
 	},
@@ -964,7 +964,7 @@ require("nvim-tree").setup({
 	view = {
 		width = 25,
 		height = 30,
-		hide_root_folder = true,
+		hide_root_folder = false,
 		side = "left",
 		mappings = {
 			custom_only = false,
