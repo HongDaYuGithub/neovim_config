@@ -170,6 +170,11 @@ _G.packer_plugins = {
     path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/neoscroll.nvim",
     url = "https://github.com/karb94/neoscroll.nvim"
   },
+  ["neovim-cmake"] = {
+    loaded = true,
+    path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/neovim-cmake",
+    url = "https://github.com/Shatur/neovim-cmake"
+  },
   ["nord.nvim"] = {
     loaded = true,
     path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/nord.nvim",
@@ -185,11 +190,6 @@ _G.packer_plugins = {
     path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/nvim-cmp",
     url = "https://github.com/hrsh7th/nvim-cmp"
   },
-  ["nvim-cursorline"] = {
-    loaded = true,
-    path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/nvim-cursorline",
-    url = "https://github.com/yamatsum/nvim-cursorline"
-  },
   ["nvim-lsp-installer"] = {
     loaded = true,
     path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/nvim-lsp-installer",
@@ -204,6 +204,16 @@ _G.packer_plugins = {
     loaded = true,
     path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/nvim-lspconfig",
     url = "https://github.com/neovim/nvim-lspconfig"
+  },
+  ["nvim-navic"] = {
+    loaded = true,
+    path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/nvim-navic",
+    url = "https://github.com/SmiteshP/nvim-navic"
+  },
+  ["nvim-notify"] = {
+    loaded = true,
+    path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/nvim-notify",
+    url = "https://github.com/rcarriga/nvim-notify"
   },
   ["nvim-surround"] = {
     config = { "\27LJ\2\n?\0\0\3\0\3\0\a6\0\0\0'\2\1\0B\0\2\0029\0\2\0004\2\0\0B\0\2\1K\0\1\0\nsetup\18nvim-surround\frequire\0" },
@@ -267,6 +277,11 @@ _G.packer_plugins = {
     path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/toggleterm.nvim",
     url = "https://github.com/akinsho/toggleterm.nvim"
   },
+  ["vim-illuminate"] = {
+    loaded = true,
+    path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/vim-illuminate",
+    url = "https://github.com/RRethy/vim-illuminate"
+  },
   ["virtual-types.nvim"] = {
     loaded = true,
     path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/virtual-types.nvim",
@@ -279,14 +294,14 @@ time([[Defining packer_plugins]], false)
 time([[Config for nvim-surround]], true)
 try_loadstring("\27LJ\2\n?\0\0\3\0\3\0\a6\0\0\0'\2\1\0B\0\2\0029\0\2\0004\2\0\0B\0\2\1K\0\1\0\nsetup\18nvim-surround\frequire\0", "config", "nvim-surround")
 time([[Config for nvim-surround]], false)
--- Config for: Comment.nvim
-time([[Config for Comment.nvim]], true)
-try_loadstring("\27LJ\2\n5\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\fComment\frequire\0", "config", "Comment.nvim")
-time([[Config for Comment.nvim]], false)
 -- Config for: toggleterm.nvim
 time([[Config for toggleterm.nvim]], true)
 try_loadstring("\27LJ\2\n8\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\15toggleterm\frequire\0", "config", "toggleterm.nvim")
 time([[Config for toggleterm.nvim]], false)
+-- Config for: Comment.nvim
+time([[Config for Comment.nvim]], true)
+try_loadstring("\27LJ\2\n5\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\fComment\frequire\0", "config", "Comment.nvim")
+time([[Config for Comment.nvim]], false)
 
 _G._packer.inside_compile = false
 if _G._packer.needs_bufread == true then

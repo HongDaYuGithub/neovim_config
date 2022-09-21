@@ -6,15 +6,13 @@ vim.cmd([[set selection=exclusive]])
 vim.cmd([[set selectmode=mouse,key]])
 vim.cmd([[set nu]])
 vim.cmd([[let mapleader=" "]])
-vim.cmd([[map <C-n> :ToggleTerm direction=float<CR>]])
 vim.cmd([[colorscheme catppuccin]])
-vim.cmd([[nmap <tab> :bn<cr>]])
+vim.cmd([[nmap <tab> :BufferLineCycleNext<cr>]])
+vim.cmd([[nmap <S-Tab> :BufferLineCyclePrev<cr>]])
 vim.cmd([[nmap <C-S> :w<cr>]])
 vim.cmd([[set showcmd]])
 vim.cmd([[set cursorline]])
-vim.cmd([[
-    autocmd FileType alpha setlocal nofoldenable
-]])
+
 vim.cmd([[set rnu]])
 
 local use = require("packer").use
@@ -28,6 +26,12 @@ require("packer").startup(function()
 			})
 		end,
 	})
+	use({
+		"SmiteshP/nvim-navic",
+		requires = "neovim/nvim-lspconfig",
+	})
+	use({ "rcarriga/nvim-notify" })
+	use({ "Shatur/neovim-cmake" })
 	use({ "simrat39/symbols-outline.nvim" })
 	-- using packer.nvim
 	use({ "akinsho/bufferline.nvim", tag = "v2.*", requires = "kyazdani42/nvim-web-devicons" })
@@ -80,7 +84,6 @@ require("packer").startup(function()
 		"nvim-treesitter/nvim-treesitter",
 		requires = "p00f/nvim-ts-rainbow",
 	})
-	use("yamatsum/nvim-cursorline")
 	use({
 		"kyazdani42/nvim-tree.lua",
 		requires = "kyazdani42/nvim-web-devicons",
@@ -96,9 +99,151 @@ require("packer").startup(function()
 			require("toggleterm").setup()
 		end,
 	})
+	use({ "RRethy/vim-illuminate" })
 	use("karb94/neoscroll.nvim")
 	use({ "mhartington/formatter.nvim" })
 end)
+
+local notify = require("notify")
+notify.setup({
+	stages = "slide",
+	on_open = nil,
+	on_close = nil,
+	timeout = 2000,
+	render = "default",
+	background_colour = "Normal",
+	minimum_width = 50,
+	level = "TRACE",
+	icons = {
+		ERROR = "",
+		WARN = "",
+		INFO = "",
+		DEBUG = "",
+		TRACE = "✎",
+	},
+})
+
+vim.notify = notify
+require("telescope").load_extension("notify")
+local nvim_lsp = require("lspconfig")
+local function switch_source_header_splitcmd(bufnr, splitcmd)
+	bufnr = nvim_lsp.util.validate_bufnr(bufnr)
+	local clangd_client = nvim_lsp.util.get_active_client_by_name(bufnr, "clangd")
+	local params = { uri = vim.uri_from_bufnr(bufnr) }
+	if clangd_client then
+		clangd_client.request("textDocument/switchSourceHeader", params, function(err, result)
+			if err then
+				error(tostring(err))
+			end
+			if not result then
+				vim.notify("Corresponding file can’t be determined", vim.log.levels.ERROR, { title = "LSP Error!" })
+				return
+			end
+			vim.api.nvim_command(splitcmd .. " " .. vim.uri_to_fname(result))
+		end)
+	else
+		vim.notify(
+			"Method textDocument/switchSourceHeader is not supported by any active server on this buffer",
+			vim.log.levels.ERROR,
+			{ title = "LSP Error!" }
+		)
+	end
+end
+
+vim.g.navic_silence = true
+local navic = require("nvim-navic")
+navic.setup({
+	icons = {
+		File = " ",
+		Module = " ",
+		Namespace = " ",
+		Package = " ",
+		Class = " ",
+		Method = " ",
+		Property = " ",
+		Field = " ",
+		Constructor = " ",
+		Enum = "練",
+		Interface = "練",
+		Function = " ",
+		Variable = " ",
+		Constant = " ",
+		String = " ",
+		Number = " ",
+		Boolean = "◩ ",
+		Array = " ",
+		Object = " ",
+		Key = " ",
+		Null = "ﳠ ",
+		EnumMember = " ",
+		Struct = " ",
+		Event = " ",
+		Operator = " ",
+		TypeParameter = " ",
+	},
+	highlight = false,
+	separator = " > ",
+	depth_limit = 0,
+	depth_limit_indicator = "..",
+})
+
+local function custom_attach(client, bufnr)
+	require("lsp_signature").on_attach({
+		debug = false, -- set to true to enable debug logging
+		log_path = vim.fn.stdpath("cache") .. "/lsp_signature.log", -- log dir when debug is on
+		-- default is  ~/.cache/nvim/lsp_signature.log
+		verbose = false, -- show debug line number
+
+		bind = true, -- This is mandatory, otherwise border config won't get registered.
+		border = "rounded",
+		-- If you want to hook lspsaga or other signature handler, pls set to false
+		doc_lines = 10, -- will show two lines of comment/doc(if there are more than two lines in doc, will be truncated);
+		-- set to 0 if you DO NOT want any API comments be shown
+		-- This setting only take effect in insert mode, it does not affect signature help in normal
+		-- mode, 10 by default
+
+		max_height = 12, -- max height of signature floating_window
+		max_width = 80, -- max_width of signature floating_window
+		wrap = true, -- allow doc/signature text wrap inside floating_window, useful if your lsp return doc/sig is too long
+
+		floating_window = true, -- show hint in a floating window, set to false for virtual text only mode
+
+		floating_window_above_cur_line = true, -- try to place the floating above the current line when possible Note:
+		-- will set to true when fully tested, set to false will use whichever side has more space
+		-- this setting will be helpful if you do not want the PUM and floating win overlap
+
+		floating_window_off_x = 1, -- adjust float windows x position.
+		floating_window_off_y = 0, -- adjust float windows y position. e.g -2 move window up 2 lines; 2 move down 2 lines
+
+		close_timeout = 4000, -- close floating window after ms when laster parameter is entered
+		fix_pos = false, -- set to true, the floating window will not auto-close until finish all parameters
+		hint_enable = true, -- virtual hint enable
+		hint_prefix = "🐼 ", -- Panda for parameter, NOTE: for the terminal not support emoji, might crash
+		hint_scheme = "String",
+		hi_parameter = "LspSignatureActiveParameter", -- how your parameter will be highlight
+		handler_opts = {
+			border = "rounded", -- double, rounded, single, shadow, none
+		},
+
+		always_trigger = false, -- sometime show signature on new line or in middle of parameter can be confusing, set it to false for #58
+
+		auto_close_after = nil, -- autoclose signature float win after x sec, disabled if nil.
+		extra_trigger_chars = {}, -- Array of extra characters that will trigger signature completion, e.g., {"(", ","}
+		zindex = 200, -- by default it will be on top of all floating windows, set to <= 50 send it to bottom
+
+		padding = "", -- character to pad on left and right of signature can be ' ', or '|'  etc
+
+		transparency = nil, -- disabled by default, allow floating win transparent value 1~100
+		shadow_blend = 36, -- if you using shadow as border use this set the opacity
+		shadow_guibg = "Black", -- if you using shadow as border use this set the color e.g. 'Green' or '#121315'
+		timer_interval = 200, -- default timer check interval set to lower value if you want to reduce latency
+		toggle_key = nil, -- toggle signature on and off in insert mode,  e.g. toggle_key = '<M-x>'
+
+		select_signature_key = nil, -- cycle to next signature, e.g. '<M-n>' function overloading
+		move_cursor_key = nil, -- imap, use nvim_set_current_win to move cursor between current win and floating
+	})
+	require("nvim-navic").attach(client, bufnr)
+end
 
 require("nvim-lsp-installer").setup({
 	automatic_installation = false, -- automatically detect which servers to install (based on which servers are set up via lspconfig)
@@ -126,26 +271,20 @@ require("nvim-treesitter.configs").setup({
 	},
 })
 
---------------------------------------------------------------
--- Eviline config for lualine
--- Author: shadmansaleh
--- Credit: glepnir
 local lualine = require("lualine")
 
--- Color table for highlights
--- stylua: ignore
 local colors = {
-  bg       = '#202328',
-  fg       = '#bbc2cf',
-  yellow   = '#ECBE7B',
-  cyan     = '#008080',
-  darkblue = '#081633',
-  green    = '#98be65',
-  orange   = '#FF8800',
-  violet   = '#a9a1e1',
-  magenta  = '#c678dd',
-  blue     = '#51afef',
-  red      = '#ec5f67',
+	bg = "#202328",
+	fg = "#bbc2cf",
+	yellow = "#ECBE7B",
+	cyan = "#008080",
+	darkblue = "#081633",
+	green = "#98be65",
+	orange = "#FF8800",
+	violet = "#a9a1e1",
+	magenta = "#c678dd",
+	blue = "#51afef",
+	red = "#ec5f67",
 }
 
 local conditions = {
@@ -165,13 +304,9 @@ local conditions = {
 -- Config
 local config = {
 	options = {
-		-- Disable sections and component separators
 		component_separators = "",
 		section_separators = "",
 		theme = {
-			-- We are going to use lualine_c an lualine_x as left and
-			-- right section. Both are highlighted by c theme .  So we
-			-- are just setting default looks o statusline
 			normal = { c = { fg = colors.fg, bg = colors.bg } },
 			inactive = { c = { fg = colors.fg, bg = colors.bg } },
 		},
@@ -216,9 +351,11 @@ ins_left({
 })
 
 ins_left({
-	-- mode component
 	function()
-		return ""
+		return require("nvim-web-devicons").get_icon_by_filetype(
+			vim.api.nvim_buf_get_option(0, "filetype"),
+			{ default = true }
+		)
 	end,
 	color = function()
 		-- auto change color according to neovims mode
@@ -250,20 +387,28 @@ ins_left({
 })
 
 ins_left({
-	-- filesize component
-	"filesize",
-	cond = conditions.buffer_not_empty,
-})
-
-ins_left({
 	"filename",
 	cond = conditions.buffer_not_empty,
 	color = { fg = colors.magenta, gui = "bold" },
 })
 
-ins_left({ "location" })
+ins_left({
+	"branch",
+	icon = "",
+	color = { fg = colors.violet, gui = "bold" },
+})
 
-ins_left({ "progress", color = { fg = colors.fg, gui = "bold" } })
+ins_left({
+	"diff",
+	-- Is it me or the symbol for modified us really weird
+	symbols = { added = " ", modified = "柳 ", removed = " " },
+	diff_color = {
+		added = { fg = colors.green },
+		modified = { fg = colors.orange },
+		removed = { fg = colors.red },
+	},
+	cond = conditions.hide_in_width,
+})
 
 ins_left({
 	"diagnostics",
@@ -276,16 +421,16 @@ ins_left({
 	},
 })
 
--- Insert mid section. You can make any number of sections in neovim :)
--- for lualine it's any number greater then 2
-ins_left({
-	function()
-		return "%="
-	end,
+ins_right({
+	"filesize",
+	cond = conditions.buffer_not_empty,
 })
 
-ins_left({
-	-- Lsp server name .
+ins_right({ "location" })
+
+ins_right({ "progress", color = { fg = colors.fg, gui = "bold" } })
+
+ins_right({
 	function()
 		local msg = "No Active Lsp"
 		local buf_ft = vim.api.nvim_buf_get_option(0, "filetype")
@@ -301,7 +446,7 @@ ins_left({
 		end
 		return msg
 	end,
-	icon = " LSP:",
+	icon = "",
 	color = { fg = "#ffffff", gui = "bold" },
 })
 
@@ -318,24 +463,6 @@ ins_right({
 	fmt = string.upper,
 	icons_enabled = false, -- I think icons are cool but Eviline doesn't have them. sigh
 	color = { fg = colors.green, gui = "bold" },
-})
-
-ins_right({
-	"branch",
-	icon = "",
-	color = { fg = colors.violet, gui = "bold" },
-})
-
-ins_right({
-	"diff",
-	-- Is it me or the symbol for modified us really weird
-	symbols = { added = " ", modified = "柳 ", removed = " " },
-	diff_color = {
-		added = { fg = colors.green },
-		modified = { fg = colors.orange },
-		removed = { fg = colors.red },
-	},
-	cond = conditions.hide_in_width,
 })
 
 ins_right({
@@ -485,7 +612,7 @@ require("toggleterm").setup({
 		vim.api.nvim_set_option_value("foldmethod", "manual", { scope = "local" })
 		vim.api.nvim_set_option_value("foldexpr", "0", { scope = "local" })
 	end,
-	open_mapping = false, -- [[<c-\>]],
+	open_mapping = [[<c-n]], -- [[<c-\>]],
 	hide_numbers = true, -- hide the number column in toggleterm buffers
 	shade_filetypes = {},
 	shade_terminals = false,
@@ -493,8 +620,9 @@ require("toggleterm").setup({
 	start_in_insert = true,
 	insert_mappings = true, -- whether or not the open mapping applies in insert mode
 	persist_size = true,
-	direction = "horizontal",
+	direction = "float",
 	close_on_exit = true, -- close the terminal window when the process exits
+	auto_scroll = true,
 	shell = vim.o.shell, -- change the default shell
 })
 
@@ -541,6 +669,7 @@ local servers = { "clangd", "pyright", "bashls", "cmake", "rust_analyzer", "sumn
 for _, lsp in ipairs(servers) do
 	lspconfig[lsp].setup({
 		capabilities = capabilities,
+		on_attach = custom_attach,
 	})
 end
 
@@ -569,8 +698,11 @@ lspconfig["sumneko_lua"].setup({
 		},
 	},
 	capabilities = capabilities,
+	on_attach = custom_attach,
 })
 
+local copy_capabilities = capabilities
+copy_capabilities.offsetEncoding = { "utf-16" }
 lspconfig["clangd"].setup({
 	cmd = {
 		"clangd",
@@ -590,86 +722,185 @@ lspconfig["clangd"].setup({
 		"--header-insertion=iwyu",
 		"-j=12",
 	},
+	commands = {
+		ClangdSwitchSourceHeader = {
+			function()
+				switch_source_header_splitcmd(0, "edit")
+			end,
+			description = "Open source/header in current buffer",
+		},
+		ClangdSwitchSourceHeaderVSplit = {
+			function()
+				switch_source_header_splitcmd(0, "vsplit")
+			end,
+			description = "Open source/header in a new vsplit",
+		},
+		ClangdSwitchSourceHeaderSplit = {
+			function()
+				switch_source_header_splitcmd(0, "split")
+			end,
+			description = "Open source/header in a new split",
+		},
+	},
+	capabilities = copy_capabilities,
+	on_attach = custom_attach,
 })
 
--- luasnip setup
-local luasnip = require("luasnip")
+function CONFIG_cmp()
+	-- vim.cmd([[packadd cmp-tabnine]])
+	local t = function(str)
+		return vim.api.nvim_replace_termcodes(str, true, true, true)
+	end
 
--- nvim-cmp setup
-local cmp = require("cmp")
-cmp.setup({
-	snippet = {
-		expand = function(args)
-			luasnip.lsp_expand(args.body)
-		end,
-	},
-	mapping = cmp.mapping.preset.insert({
-		["<C-d>"] = cmp.mapping.scroll_docs(-4),
-		["<C-f>"] = cmp.mapping.scroll_docs(4),
-		["<C-Space>"] = cmp.mapping.complete(),
-		["<CR>"] = cmp.mapping.confirm({
-			behavior = cmp.ConfirmBehavior.Replace,
-			select = true,
+	local has_words_before = function()
+		local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+		return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+	end
+
+	local border = function(hl)
+		return {
+			{ "╭", hl },
+			{ "─", hl },
+			{ "╮", hl },
+			{ "│", hl },
+			{ "╯", hl },
+			{ "─", hl },
+			{ "╰", hl },
+			{ "│", hl },
+		}
+	end
+
+	local cmp_window = require("cmp.utils.window")
+
+	cmp_window.info_ = cmp_window.info
+	cmp_window.info = function(self)
+		local info = self:info_()
+		info.scrollable = false
+		return info
+	end
+
+	local compare = require("cmp.config.compare")
+
+	local cmp = require("cmp")
+	cmp.setup({
+		window = {
+			completion = {
+				border = border("CmpBorder"),
+				winhighlight = "Normal:CmpPmenu,CursorLine:PmenuSel,Search:None",
+			},
+			documentation = {
+				border = border("CmpDocBorder"),
+			},
+		},
+		sorting = {
+			comparators = {
+				compare.offset,
+				compare.exact,
+				compare.score,
+				compare.kind,
+				compare.sort_text,
+				compare.length,
+				compare.order,
+			},
+		},
+		formatting = {
+			format = function(entry, vim_item)
+				local lspkind_icons = {
+					Text = "",
+					Method = "",
+					Function = "",
+					Constructor = "",
+					Field = "",
+					Variable = "",
+					Class = "ﴯ",
+					Interface = "",
+					Module = "",
+					Property = "ﰠ",
+					Unit = "",
+					Value = "",
+					Enum = "",
+					Keyword = "",
+					Snippet = "",
+					Color = "",
+					File = "",
+					Reference = "",
+					Folder = "",
+					EnumMember = "",
+					Constant = "",
+					Struct = "",
+					Event = "",
+					Operator = "",
+					TypeParameter = "",
+				}
+				-- load lspkind icons
+				vim_item.kind = string.format("%s %s", lspkind_icons[vim_item.kind], vim_item.kind)
+
+				vim_item.menu = ({
+					-- cmp_tabnine = "[TN]",
+					buffer = "[BUF]",
+					orgmode = "[ORG]",
+					nvim_lsp = "[LSP]",
+					nvim_lua = "[LUA]",
+					path = "[PATH]",
+					tmux = "[TMUX]",
+					luasnip = "[SNIP]",
+					spell = "[SPELL]",
+				})[entry.source.name]
+
+				return vim_item
+			end,
+		},
+		-- You can set mappings if you want
+		mapping = cmp.mapping.preset.insert({
+			["<CR>"] = cmp.mapping.confirm({ select = true }),
+			["<C-p>"] = cmp.mapping.select_prev_item(),
+			["<C-n>"] = cmp.mapping.select_next_item(),
+			["<C-d>"] = cmp.mapping.scroll_docs(-4),
+			["<C-f>"] = cmp.mapping.scroll_docs(4),
+			["<C-e>"] = cmp.mapping.close(),
+			["<Tab>"] = cmp.mapping(function(fallback)
+				if cmp.visible() then
+					cmp.select_next_item()
+				elseif require("luasnip").expand_or_jumpable() then
+					vim.fn.feedkeys(t("<Plug>luasnip-expand-or-jump"), "")
+				elseif has_words_before() then
+					cmp.complete()
+				else
+					fallback()
+				end
+			end, { "i", "s" }),
+			["<S-Tab>"] = cmp.mapping(function(fallback)
+				if cmp.visible() then
+					cmp.select_prev_item()
+				elseif require("luasnip").jumpable(-1) then
+					vim.fn.feedkeys(t("<Plug>luasnip-jump-prev"), "")
+				else
+					fallback()
+				end
+			end, { "i", "s" }),
 		}),
-		["<Tab>"] = cmp.mapping(function(fallback)
-			if cmp.visible() then
-				cmp.select_next_item()
-			elseif luasnip.expand_or_jumpable() then
-				luasnip.expand_or_jump()
-			else
-				fallback()
-			end
-		end, { "i", "s" }),
-		["<S-Tab>"] = cmp.mapping(function(fallback)
-			if cmp.visible() then
-				cmp.select_prev_item()
-			elseif luasnip.jumpable(-1) then
-				luasnip.jump(-1)
-			else
-				fallback()
-			end
-		end, { "i", "s" }),
-	}),
-	formatting = {
-		fields = { "kind", "abbr", "menu" },
-		format = function(entry, vim_item)
-			-- Kind icons
-			vim_item.kind = string.format("%s", kind_icons[vim_item.kind])
-			vim_item.menu = ({
-				nvim_lsp = "[LSP]",
-				ultisnips = "[Snippet]",
-				buffer = "[Buffer]",
-				path = "[Path]",
-			})[entry.source.name]
-			return vim_item
-		end,
-	},
-	sources = {
-		{ name = "nvim_lsp" },
-		{ name = "luasnip" },
-		{ name = "buffer" },
-		{ name = "path" },
-	},
-	options = {
-		indexing_interval = 10,
-	},
-})
+		snippet = {
+			expand = function(args)
+				require("luasnip").lsp_expand(args.body)
+			end,
+		},
+		-- You should specify your *installed* sources.
+		sources = {
+			{ name = "nvim_lsp" },
+			{ name = "nvim_lua" },
+			{ name = "luasnip" },
+			{ name = "path" },
+			{ name = "spell" },
+			{ name = "tmux" },
+			{ name = "orgmode" },
+			{ name = "buffer" },
+			{ name = "latex_symbols" },
+			-- { name = "cmp_tabnine" },
+		},
+	})
+end
 
-cmp.setup.cmdline("/", {
-	completion = { autocomplete = false },
-	sources = {
-		{ name = "buffer" },
-	},
-})
-
-cmp.setup.cmdline(":", {
-	completion = { autocomplete = false },
-	sources = cmp.config.sources({
-		{ name = "path" },
-	}, {
-		{ name = "cmdline" },
-	}),
-})
+CONFIG_cmp()
 
 require("nvim-treesitter.configs").setup({
 	-- A list of parser names, or "all"
@@ -731,9 +962,9 @@ require("nvim-tree").setup({
 		timeout = 200,
 	},
 	view = {
-		width = 30,
+		width = 25,
 		height = 30,
-		hide_root_folder = false,
+		hide_root_folder = true,
 		side = "left",
 		mappings = {
 			custom_only = false,
@@ -808,7 +1039,7 @@ require("nvim-tree").setup({
 		},
 		open_file = {
 			quit_on_open = false,
-			resize_window = false,
+			resize_window = true,
 			window_picker = {
 				enable = true,
 				chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
@@ -821,28 +1052,8 @@ require("nvim-tree").setup({
 	},
 })
 
-require("nvim-cursorline").setup({
-	cursorline = {
-		enable = true,
-		timeout = 1000,
-		number = false,
-	},
-	cursorword = {
-		enable = true,
-		min_length = 3,
-		hl = { underline = true },
-	},
-})
-
 vim.g.catppuccin_flavour = "macchiato" -- latte, frappe, macchiato, mocha
 
--- Theme
-
-require("catppuccin").setup()
-
--- nord colorscheme
-
--- Lua
 local actions = require("diffview.actions")
 
 require("diffview").setup({
@@ -979,7 +1190,7 @@ augroup END
 
 local keymap = vim.keymap.set
 keymap("n", "gh", "<cmd>Lspsaga lsp_finder<CR>", { silent = true })
-
+keymap("n", "<C-n>", "<cmd>ToggleTerm direction=float<CR>")
 keymap("i", "<A-j>", "<Esc>:m .+1<CR>==gi", { silent = true })
 keymap("i", "<A-k>", "<Esc>:m .-2<CR>==gi", { silent = true })
 keymap("n", "<A-j>", "<Esc>:m .+1<CR>==", { silent = true })
@@ -996,6 +1207,13 @@ keymap("n", "<leader>w", "<cmd>Telescope live_grep<CR>", { silent = true })
 keymap("n", "<leader>f", "<cmd>Telescope find_files<CR>", { silent = true })
 keymap("n", "<C-q>", "<cmd>wa!|qa!<CR>", { silent = true })
 
+keymap("n", "<C-h>", "<C-w>h", { silent = true })
+keymap("n", "<C-j>", "<C-w>j", { silent = true })
+keymap("n", "<C-k>", "<C-w>k", { silent = true })
+keymap("n", "<C-l>", "<C-w>l", { silent = true })
+
+keymap("n", "<A-s>", "<cmd>sp<CR>", { silent = true })
+keymap("n", "<A-v>", "<cmd>vsp<CR>", { silent = true })
 -- Rename
 keymap("n", "gr", "<cmd>Lspsaga rename<CR>", { silent = true })
 
@@ -1064,12 +1282,6 @@ dashboard.section.footer.val = {
 -- Send config to alpha
 alpha.setup(dashboard.opts)
 
-require("lsp_signature").setup({
-	bind = true, -- This is mandatory, otherwise border config won't get registered.
-	handler_opts = {
-		border = "rounded",
-	},
-})
 require("gitsigns").setup({
 	signs = {
 		add = { hl = "GitSignsAdd", text = "│", numhl = "GitSignsAddNr", linehl = "GitSignsAddLn" },
@@ -1111,7 +1323,6 @@ require("gitsigns").setup({
 		enable = false,
 	},
 })
--- set rnu for vim number line
 
 require("nvim-treesitter.configs").setup({
 	pairs = {
@@ -1129,7 +1340,6 @@ require("nvim-treesitter.configs").setup({
 			only_on_first_char = false, -- whether to trigger balanced delete when on first character of a pair
 			fallback_cmd_normal = nil, -- fallback command when no pair found, can be nil
 			longest_partner = false, -- whether to delete the longest or the shortest pair when multiple found.
-			-- E.g. whether to delete the angle bracket or whole tag in  <pair> </pair>
 		},
 	},
 })
@@ -1138,7 +1348,7 @@ vim.opt.termguicolors = true
 require("bufferline").setup({
 	options = {
 		mode = "buffers", -- set to "tabs" to only show tabpages instead
-		numbers = "none", -- can be "none" | "ordinal" | "buffer_id" | "both" | function
+		numbers = "buffer_id", -- can be "none" | "ordinal" | "buffer_id" | "both" | function
 		close_command = "bdelete! %d", -- can be a string | function, see "Mouse actions"
 		right_mouse_command = "vert sbuffer %d", -- can be a string | function, see "Mouse actions"
 		left_mouse_command = "buffer %d", -- can be a string | function, see "Mouse actions"
@@ -1152,12 +1362,7 @@ require("bufferline").setup({
 		close_icon = "",
 		left_trunc_marker = "",
 		right_trunc_marker = "",
-		--- name_formatter can be used to change the buffer's label in the bufferline.
-		--- Please note some names can/will break the
-		--- bufferline so use this at your discretion knowing that it has
-		--- some limitations that will *NOT* be fixed.
 		name_formatter = function(buf) -- buf contains a "name", "path" and "bufnr"
-			-- remove extension from markdown files for example
 			if buf.name:match("%.md") then
 				return vim.fn.fnamemodify(buf.name, ":t:r")
 			end
@@ -1167,35 +1372,11 @@ require("bufferline").setup({
 		truncate_names = true, -- whether or not tab names should be truncated
 		tab_size = 18,
 		diagnostics = "nvim_lsp",
-		diagnostics_update_in_insert = false,
-		-- NOTE: this will be called a lot so don't do any heavy processing here
+		diagnostics_update_in_insert = true,
 		offsets = {
-			{
-				filetype = "undotree",
-				text = "Undotree",
-				highlight = "PanelHeading",
-				padding = 1,
-			},
 			{
 				filetype = "NvimTree",
 				text = "File Explorer",
-				highlight = "PanelHeading",
-				padding = 1,
-			},
-			{
-				filetype = "DiffviewFiles",
-				text = "Diff View",
-				highlight = "PanelHeading",
-				padding = 1,
-			},
-			{
-				filetype = "flutterToolsOutline",
-				text = "Flutter Outline",
-				highlight = "PanelHeading",
-			},
-			{
-				filetype = "packer",
-				text = "Packer",
 				highlight = "PanelHeading",
 				padding = 1,
 			},
@@ -1217,3 +1398,112 @@ require("bufferline").setup({
 		sort_by = "id",
 	},
 })
+
+local Path = require("plenary.path")
+require("cmake").setup({
+	cmake_executable = "cmake", -- CMake executable to run.
+	save_before_build = true, -- Save all buffers before building.
+	parameters_file = "cmake_build.json", -- JSON file to store information about selected target, run arguments and build type.
+	default_parameters = { args = {}, build_type = "Debug" }, -- The default values in `parameters_file`. Can also optionally contain `run_dir` with the working directory for applications.
+	build_dir = tostring(Path:new("{cwd}", "build", "{os}-{build_type}")), -- Build directory. The expressions `{cwd}`, `{os}` and `{build_type}` will be expanded with the corresponding text values. Could be a function that return the path to the build directory.
+	default_projects_path = tostring(Path:new(vim.loop.os_homedir(), "Projects")), -- Default folder for creating project.
+	configure_args = { "-D", "CMAKE_EXPORT_COMPILE_COMMANDS=1" }, -- Default arguments that will be always passed at cmake configure step. By default tells cmake to generate `compile_commands.json`.
+	build_args = {}, -- Default arguments that will be always passed at cmake build step.
+	on_build_output = nil, -- Callback that will be called each time data is received by the current process. Accepts the received data as an argument.
+	quickfix = {
+		pos = "botright", -- Where to open quickfix
+		height = 10, -- Height of the opened quickfix.
+		only_on_error = false, -- Open quickfix window only if target build failed.
+	},
+	copy_compile_commands = true, -- Copy compile_commands.json to current working directory.
+	dap_configurations = { -- Table of different DAP configurations.
+		lldb_vscode = { type = "lldb", request = "launch" },
+		cppdbg_vscode = { type = "cppdbg", request = "launch" },
+	},
+	dap_configuration = "lldb_vscode", -- DAP configuration to use if the projects `parameters_file` does not specify one.
+	dap_open_command = function(...)
+		require("dap").repl.open(...)
+	end, -- Command to run after starting DAP session. You can set it to `false` if you don't want to open anything or `require('dapui').open` if you are using https://github.com/rcarriga/nvim-dap-ui
+})
+require("luasnip").config.set_config({
+	history = true,
+	updateevents = "TextChanged,TextChangedI",
+	delete_check_events = "TextChanged,InsertLeave",
+})
+require("luasnip.loaders.from_lua").lazy_load()
+require("luasnip.loaders.from_vscode").lazy_load()
+require("luasnip.loaders.from_snipmate").lazy_load()
+
+function Configlspsaga()
+	local function set_sidebar_icons()
+		local diagnostic_icons = {
+			Error = " ",
+			Warn = " ",
+			Info = " ",
+			Hint = " ",
+		}
+		for type, icon in pairs(diagnostic_icons) do
+			local hl = "DiagnosticSign" .. type
+			vim.fn.sign_define(hl, { text = icon, texthl = hl })
+		end
+	end
+
+	local function get_palette()
+		if vim.g.colors_name == "catppuccin" then
+			-- If the colorscheme is catppuccin then use the palette.
+			return require("catppuccin.palettes").get_palette()
+		else
+			-- Default behavior: return lspsaga's default palette.
+			local palette = require("lspsaga.lspkind").colors
+			palette.peach = palette.orange
+			palette.flamingo = palette.orange
+			palette.rosewater = palette.yellow
+			palette.mauve = palette.violet
+			palette.sapphire = palette.blue
+			palette.maroon = palette.orange
+
+			return palette
+		end
+	end
+
+	set_sidebar_icons()
+
+	local Colors = get_palette()
+
+	require("lspsaga").init_lsp_saga({
+		diagnostic_header = { " ", " ", "  ", " " },
+		custom_kind = {
+			File = { " ", Colors.rosewater },
+			Module = { " ", Colors.blue },
+			Namespace = { " ", Colors.blue },
+			Package = { " ", Colors.blue },
+			Class = { "ﴯ ", Colors.yellow },
+			Method = { " ", Colors.blue },
+			Property = { "ﰠ ", Colors.teal },
+			Field = { " ", Colors.teal },
+			Constructor = { " ", Colors.sapphire },
+			Enum = { " ", Colors.yellow },
+			Interface = { " ", Colors.yellow },
+			Function = { " ", Colors.blue },
+			Variable = { " ", Colors.peach },
+			Constant = { " ", Colors.peach },
+			String = { " ", Colors.green },
+			Number = { " ", Colors.peach },
+			Boolean = { " ", Colors.peach },
+			Array = { " ", Colors.peach },
+			Object = { " ", colors.yellow },
+			Key = { " ", colors.red },
+			Null = { "ﳠ ", colors.yellow },
+			EnumMember = { " ", colors.teal },
+			Struct = { " ", colors.yellow },
+			Event = { " ", colors.yellow },
+			Operator = { " ", colors.sky },
+			TypeParameter = { " ", colors.maroon },
+			-- ccls-specific icons.
+			TypeAlias = { " ", colors.green },
+			Parameter = { " ", colors.blue },
+			StaticMethod = { "ﴂ ", colors.peach },
+			Macro = { " ", colors.red },
+		},
+	})
+end
