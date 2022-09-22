@@ -17,6 +17,8 @@ vim.cmd([[set rnu]])
 
 local use = require("packer").use
 require("packer").startup(function()
+	use({ "dstein64/vim-startuptime" })
+	use({ "arkav/lualine-lsp-progress" })
 	use({
 		"kylechui/nvim-surround",
 		tag = "*", -- Use for stability; omit to use `main` branch for the latest features
@@ -421,6 +423,10 @@ ins_left({
 	},
 })
 
+ins_left({
+	"lsp_progress",
+})
+
 ins_right({
 	"filesize",
 	cond = conditions.buffer_not_empty,
@@ -629,34 +635,6 @@ require("toggleterm").setup({
 require("nvim-autopairs").setup({})
 
 require("neoscroll").setup()
-
-local kind_icons = {
-	Text = "",
-	Method = "m",
-	Function = "",
-	Constructor = "",
-	Field = "",
-	Variable = "",
-	Class = "",
-	Interface = "",
-	Module = "",
-	Property = "",
-	Unit = "",
-	Value = "",
-	Enum = "",
-	Keyword = "",
-	Snippet = "",
-	Color = "",
-	File = "",
-	Reference = "",
-	Folder = "",
-	EnumMember = "",
-	Constant = "",
-	Struct = "",
-	Event = "",
-	Operator = "",
-	TypeParameter = "",
-}
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
@@ -1349,15 +1327,15 @@ require("bufferline").setup({
 	options = {
 		mode = "buffers", -- set to "tabs" to only show tabpages instead
 		numbers = "buffer_id", -- can be "none" | "ordinal" | "buffer_id" | "both" | function
-		close_command = "bdelete! %d", -- can be a string | function, see "Mouse actions"
+		close_command = "bdelete %d", -- can be a string | function, see "Mouse actions"
 		right_mouse_command = "vert sbuffer %d", -- can be a string | function, see "Mouse actions"
 		left_mouse_command = "buffer %d", -- can be a string | function, see "Mouse actions"
-		middle_mouse_command = nil, -- can be a string | function, see "Mouse actions"
+		middle_mouse_command = "BufferLineCycleNext", -- can be a string | function, see "Mouse actions"
 		indicator = {
 			icon = "▎", -- this should be omitted if indicator style is not 'icon'
 			style = "icon", -- can also be 'underline'|'none',
 		},
-		buffer_close_icon = "",
+		buffer_close_icon = "",
 		modified_icon = "●",
 		close_icon = "",
 		left_trunc_marker = "",
@@ -1405,26 +1383,19 @@ require("cmake").setup({
 	save_before_build = true, -- Save all buffers before building.
 	parameters_file = "cmake_build.json", -- JSON file to store information about selected target, run arguments and build type.
 	default_parameters = { args = {}, build_type = "Debug" }, -- The default values in `parameters_file`. Can also optionally contain `run_dir` with the working directory for applications.
-	build_dir = tostring(Path:new("{cwd}", "build", "{os}-{build_type}")), -- Build directory. The expressions `{cwd}`, `{os}` and `{build_type}` will be expanded with the corresponding text values. Could be a function that return the path to the build directory.
+	build_dir = tostring(Path:new("{cwd}", "build")), -- Build directory. The expressions `{cwd}`, `{os}` and `{build_type}` will be expanded with the corresponding text values. Could be a function that return the path to the build directory.
 	default_projects_path = tostring(Path:new(vim.loop.os_homedir(), "Projects")), -- Default folder for creating project.
 	configure_args = { "-D", "CMAKE_EXPORT_COMPILE_COMMANDS=1" }, -- Default arguments that will be always passed at cmake configure step. By default tells cmake to generate `compile_commands.json`.
 	build_args = {}, -- Default arguments that will be always passed at cmake build step.
 	on_build_output = nil, -- Callback that will be called each time data is received by the current process. Accepts the received data as an argument.
 	quickfix = {
-		pos = "botright", -- Where to open quickfix
+		pos = "border", -- Where to open quickfix
 		height = 10, -- Height of the opened quickfix.
 		only_on_error = false, -- Open quickfix window only if target build failed.
 	},
 	copy_compile_commands = true, -- Copy compile_commands.json to current working directory.
-	dap_configurations = { -- Table of different DAP configurations.
-		lldb_vscode = { type = "lldb", request = "launch" },
-		cppdbg_vscode = { type = "cppdbg", request = "launch" },
-	},
-	dap_configuration = "lldb_vscode", -- DAP configuration to use if the projects `parameters_file` does not specify one.
-	dap_open_command = function(...)
-		require("dap").repl.open(...)
-	end, -- Command to run after starting DAP session. You can set it to `false` if you don't want to open anything or `require('dapui').open` if you are using https://github.com/rcarriga/nvim-dap-ui
 })
+
 require("luasnip").config.set_config({
 	history = true,
 	updateevents = "TextChanged,TextChangedI",

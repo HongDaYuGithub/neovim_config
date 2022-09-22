@@ -160,6 +160,11 @@ _G.packer_plugins = {
     path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/lspsaga.nvim",
     url = "https://github.com/glepnir/lspsaga.nvim"
   },
+  ["lualine-lsp-progress"] = {
+    loaded = true,
+    path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/lualine-lsp-progress",
+    url = "https://github.com/arkav/lualine-lsp-progress"
+  },
   ["lualine.nvim"] = {
     loaded = true,
     path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/lualine.nvim",
@@ -281,6 +286,11 @@ _G.packer_plugins = {
     loaded = true,
     path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/vim-illuminate",
     url = "https://github.com/RRethy/vim-illuminate"
+  },
+  ["vim-startuptime"] = {
+    loaded = true,
+    path = "/home/HongDaYu/.local/share/nvim/site/pack/packer/start/vim-startuptime",
+    url = "https://github.com/dstein64/vim-startuptime"
   },
   ["virtual-types.nvim"] = {
     loaded = true,
