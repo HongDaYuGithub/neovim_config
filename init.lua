@@ -15,6 +15,19 @@ vim.cmd([[set cursorline]])
 
 vim.cmd([[set rnu]])
 
+local ensure_packer = function()
+	local fn = vim.fn
+	local install_path = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
+	if fn.empty(fn.glob(install_path)) > 0 then
+		fn.system({ "git", "clone", "--depth", "1", "https://github.com/wbthomason/packer.nvim", install_path })
+		vim.cmd([[packadd packer.nvim]])
+		return true
+	end
+	return false
+end
+
+local packer_bootstrap = ensure_packer()
+
 local use = require("packer").use
 require("packer").startup(function()
 	use({ "dstein64/vim-startuptime" })
@@ -33,7 +46,6 @@ require("packer").startup(function()
 		requires = "neovim/nvim-lspconfig",
 	})
 	use({ "rcarriga/nvim-notify" })
-	use({ "Shatur/neovim-cmake" })
 	use({ "simrat39/symbols-outline.nvim" })
 	-- using packer.nvim
 	use({ "akinsho/bufferline.nvim", tag = "v2.*", requires = "kyazdani42/nvim-web-devicons" })
@@ -104,6 +116,9 @@ require("packer").startup(function()
 	use({ "RRethy/vim-illuminate" })
 	use("karb94/neoscroll.nvim")
 	use({ "mhartington/formatter.nvim" })
+	if packer_bootstrap then
+		require("packer").sync()
+	end
 end)
 
 local notify = require("notify")
@@ -941,12 +956,22 @@ require("nvim-tree").setup({
 	},
 	view = {
 		width = 25,
-		height = 30,
 		hide_root_folder = false,
 		side = "left",
 		mappings = {
 			custom_only = false,
 			list = {},
+		},
+		float = {
+			enable = false,
+			open_win_config = {
+				relative = "editor",
+				border = "rounded",
+				width = 30,
+				height = 30,
+				row = 1,
+				col = 1,
+			},
 		},
 		number = false,
 		relativenumber = false,
@@ -989,7 +1014,7 @@ require("nvim-tree").setup({
 	},
 	filters = {
 		dotfiles = false,
-		custom = { "node_modules", "\\.cache" },
+		custom = { "node_modules", "\\.cache", "\\.config" },
 		exclude = {},
 	},
 	trash = {
@@ -1375,25 +1400,6 @@ require("bufferline").setup({
 		},
 		sort_by = "id",
 	},
-})
-
-local Path = require("plenary.path")
-require("cmake").setup({
-	cmake_executable = "cmake", -- CMake executable to run.
-	save_before_build = true, -- Save all buffers before building.
-	parameters_file = "cmake_build.json", -- JSON file to store information about selected target, run arguments and build type.
-	default_parameters = { args = {}, build_type = "Debug" }, -- The default values in `parameters_file`. Can also optionally contain `run_dir` with the working directory for applications.
-	build_dir = tostring(Path:new("{cwd}", "build")), -- Build directory. The expressions `{cwd}`, `{os}` and `{build_type}` will be expanded with the corresponding text values. Could be a function that return the path to the build directory.
-	default_projects_path = tostring(Path:new(vim.loop.os_homedir(), "Projects")), -- Default folder for creating project.
-	configure_args = { "-D", "CMAKE_EXPORT_COMPILE_COMMANDS=1" }, -- Default arguments that will be always passed at cmake configure step. By default tells cmake to generate `compile_commands.json`.
-	build_args = {}, -- Default arguments that will be always passed at cmake build step.
-	on_build_output = nil, -- Callback that will be called each time data is received by the current process. Accepts the received data as an argument.
-	quickfix = {
-		pos = "border", -- Where to open quickfix
-		height = 10, -- Height of the opened quickfix.
-		only_on_error = false, -- Open quickfix window only if target build failed.
-	},
-	copy_compile_commands = true, -- Copy compile_commands.json to current working directory.
 })
 
 require("luasnip").config.set_config({
